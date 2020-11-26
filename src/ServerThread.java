@@ -1,94 +1,29 @@
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.net.Socket;
-import java.util.Random;
+import java.io.InputStreamReader;
 
-/**
- *
- * The class{@code ServerThread} manages the interaction
- * with a client of the server.
- *
-**/
-
-public class ServerThread implements Runnable{
-	private static final int MAX = 100;
-	private static final long SLEEPTIME = 200;
-
-	private Server server;
+public class ServerThread extends Thread {
 	private Socket socket;
 
-	/**
-	 * Class constructor.
-	 *
-	 * @param s  the server.
-	 * @param c  the client socket.
-	 *
-	 **/
-	public ServerThread(final Server s, final Socket c){
-		this.server = s;
-		this.socket = c;
+	ServerThread(Socket socket) {
+		this.socket = socket;
 	}
 
-	@Override
-	public void run(){
+	public void run() {
 
-		ObjectInputStream  is = null;
-		ObjectOutputStream os = null;
-
-		try{
-			is = new ObjectInputStream(new BufferedInputStream(
-				this.socket.getInputStream()));
-		}
-
-		catch (Exception e){
+		try {
+			String message = null;
+			BufferedReader bufferReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			
+			while((message = bufferReader.readLine()) != null) {
+				System.out.println("message received: " + message);
+			}
+			//connection reset exception when client stops
+			socket.close();
+		} catch (IOException e) {
 			e.printStackTrace();
-			return;
 		}
 
-		Random r = new Random();
-		String id = String.valueOf(this.hashCode());
-
-		while (true){
-			try{
-
-				Object i = is.readObject();
-
-				if (i instanceof Request){
-					Request rq = (Request) i;
-
-					System.out.format("thread %s receives: %s from its client%n",
-						id, rq.getValue());
-					Thread.sleep(SLEEPTIME);
-
-					if (os == null){
-						os = new ObjectOutputStream(new BufferedOutputStream(
-							this.socket.getOutputStream()));
-					}
-
-					Response rs = new Response(r.nextInt(MAX));
-
-					System.out.format("thread %s sends: %s to its client%n",
-						id, rs.getValue());
-					os.writeObject(rs);
-					os.flush();
-
-					if (rs.getValue() == 0){
-						
-						if (this.server.getPool().getActiveCount() == 1){
-							this.server.close();
-						}
-
-						this.socket.close();
-						return;
-					}
-				}
-			}
-			catch (Exception e){
-				e.printStackTrace();
-				System.exit(0);
-			}
-		}
 	}
 }
