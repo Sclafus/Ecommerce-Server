@@ -17,14 +17,13 @@ public class ServerThread extends Thread {
 		try {
 			String message = null;
 			BufferedReader bufferReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			
-			while((message = bufferReader.readLine()) != null) {
-				System.out.println("message received: " + message);
+
+			while ((message = bufferReader.readLine()) != null) {
 				PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
-				printWriter.println();
+				printWriter.println("server received: " + message);
 
 			}
-			//connection reset exception when client stops
+			
 			socket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
