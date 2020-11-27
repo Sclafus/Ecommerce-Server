@@ -9,3 +9,7 @@ It's using:
 This program is the Server of the architecture (clearly). 
 
 The Client application is available [here](https://github.com/Sclafus/Ecommerce-GUI).
+
+The DB structure is pretty simple. It has some flaws, but this is not meant to be used in production, so... ¯\_(ツ)_/¯
+
+![Database Structure]("./db_structure.png")
