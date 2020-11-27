@@ -12,4 +12,4 @@ The Client application is available [here](https://github.com/Sclafus/Ecommerce-
 
 The DB structure is pretty simple. It has some flaws, but this is not meant to be used in production, so... ¯\_(ツ)_/¯
 
-![Database Structure]("db_structure.png")
+![Database Structure]("https://raw.githubusercontent.com/Sclafus/Ecommerce-Server/senpai/db_structure.png")
