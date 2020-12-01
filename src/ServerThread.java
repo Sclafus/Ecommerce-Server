@@ -39,11 +39,24 @@ public class ServerThread extends Thread {
 						out.writeObject(login_result);
 						break;
 
-					case "register":
-						int register_result = register(msg[1], msg[2], msg[3], msg[4]);
-						out.writeObject(register_result);
+					case "register_user":
+						int register_user_result = register(msg[1], msg[2], msg[3], msg[4], 1);
+						out.writeObject(register_user_result);
 						break;
 
+					case "register_employee":
+						int register_employee_result = register(msg[1], msg[2], msg[3], msg[4], 2);
+						out.writeObject(register_employee_result);
+						break;
+					
+					case "add_wine":
+						int add_wine_result = add_wine(msg[1], Integer.parseInt(msg[2]), msg[3], msg[4], msg[5]);
+						out.writeObject(add_wine_result);
+						break;
+
+					case "restock_wine":
+						break;
+						
 					default:
 						break;
 				}
@@ -101,24 +114,72 @@ public class ServerThread extends Thread {
 		return -2;
 	}
 	
-	public static int register(String name, String surname, String mail, String password){
-				
-		Connection connection = getConnection();
-		String query = String.format("INSERT INTO user(name, surname, email, password) VALUES ('%s', '%s', '%s', '%s')", 
-		name,surname, mail, password);
 
-		try{
+	public static int add_wine(String name, int year, String producer, String grapes, String notes){
+
+		Connection connection = getConnection();
+		String query = String.format("SELECT name, year, producer FROM wine WHERE name='%s', year='%d', producer='%s'",
+		 name, year, producer);
+		try {
 			PreparedStatement statement = connection.prepareStatement(query);
-			statement.executeUpdate();
-			
-		} catch (SQLException e){
+			ResultSet query_result = statement.executeQuery();
+
+			if(!query_result.next()){
+				//wine has not been added yet.
+				return -1;
+			} else{
+				String query1 = String.format("INSERT INTO wine(name, year, producer, grapeWines, notes) VALUES ('%s', '%d', '%s', '%s', '%s')", 
+				name, year, producer, grapes, notes);
+
+				try{
+					PreparedStatement statement1 = connection.prepareStatement(query1);
+					statement1.executeUpdate();
+				} catch (SQLException e){
+					e.printStackTrace();
+				} finally{
+					System.out.format("Wine %s %s has been added\n", name, year);
+				}
+				return 0;
+			}
+		} catch (SQLException e) {
 			e.printStackTrace();
-		}
-		finally{
-			System.out.format("user %s has been added", mail);
 		}
 		return 0;
 	}
+
+
+	public static int register(String name, String surname, String mail, String password, int permission){
+				
+		Connection connection = getConnection();
+		String query = String.format("SELECT mail FROM user WHERE mail='%s'", mail);
+		try {
+			PreparedStatement statement = connection.prepareStatement(query);
+			ResultSet query_result = statement.executeQuery();
+
+			if(!query_result.next()){
+				//user has not been registered yet.
+				return -1;
+			} else{
+				String query1 = String.format("INSERT INTO user(name, surname, email, password, permission) VALUES ('%s', '%s', '%s', '%s', '%d')", 
+				name,surname, mail, password, permission);
+
+				try{
+					PreparedStatement statement1 = connection.prepareStatement(query1);
+					statement1.executeUpdate();
+				} catch (SQLException e){
+					e.printStackTrace();
+				} finally{
+					System.out.format("User %s has been added\n", mail);
+				}
+				return 0;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+		
+	
 	/*
 	public static ArrayList<Object[]> execQuery(String query, String... fields) {
 		try {
