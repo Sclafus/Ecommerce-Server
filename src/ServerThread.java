@@ -25,15 +25,23 @@ public class ServerThread extends Thread {
 		try {
 			InputStream inputStream = this.socket.getInputStream();
 			ObjectInputStream in = new ObjectInputStream(inputStream);
+
 			try {
-				String[] message = (String[]) in.readObject();
+				String[] msg = (String[]) in.readObject();
 				OutputStream outputStream = this.socket.getOutputStream();
 				ObjectOutputStream out = new ObjectOutputStream(outputStream);
+
 				// stuff happens here!
-				switch (message[0]) {
+				switch (msg[0]) {
+
 					case "login":
-					Boolean login_result = login(message[1], message[2]);
-					out.writeObject(login_result);
+						int login_result = login(msg[1], msg[2]);
+						out.writeObject(login_result);
+						break;
+
+					case "register":
+						int register_result = register(msg[1], msg[2], msg[3], msg[4]);
+						out.writeObject(register_result);
 						break;
 
 					default:
@@ -65,30 +73,53 @@ public class ServerThread extends Thread {
 		return null;
 	}
 
-	public static Boolean login(String username, String password) {
+	public static int login(String username, String password) {
+		
 		Connection connection = getConnection();
-		String query = String.format("SELECT email, password FROM user WHERE email='%s'", username);
+		String query = String.format("SELECT email, password, permission FROM user WHERE email='%s'", username);
 		try {
 			PreparedStatement statement = connection.prepareStatement(query);
 			ResultSet query_result = statement.executeQuery();
 
 			if(!query_result.next()){
-				return false;
+				//account doesn't exist.
+				return -1;
 			} else {
+				//account exists
 				String pwd = query_result.getString("password");
-				
+				int permission = query_result.getInt("permission");
 				if (password.equals(pwd)){
-					return true;
+					return permission;
 				} else {
-					return false;
+					//wrong password
+					return 0;
 				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return null;
+		return -2;
 	}
+	
+	public static int register(String name, String surname, String mail, String password){
+				
+		Connection connection = getConnection();
+		String query = String.format("INSERT INTO user(name, surname, email, password) VALUES ('%s', '%s', '%s', '%s')", 
+		name,surname, mail, password);
 
+		try{
+			PreparedStatement statement = connection.prepareStatement(query);
+			statement.executeUpdate();
+			
+		} catch (SQLException e){
+			e.printStackTrace();
+		}
+		finally{
+			System.out.format("user %s has been added", mail);
+		}
+		return 0;
+	}
+	/*
 	public static ArrayList<Object[]> execQuery(String query, String... fields) {
 		try {
 			//connects to db, executes the query, gets result
@@ -100,11 +131,11 @@ public class ServerThread extends Thread {
 
 			if(fields.length > 0){
 				ArrayList<Object> tmp = new ArrayList<Object>();
-				/* 
+				 
 				checks every element of result, inserts it in tmp,
 				tmp gets converted to an array of strings and then cleared,
 	
-				*/
+				
 				while (query_result.next()){
 					for (String field : fields){
 						tmp.add(query_result.getString(field));
@@ -123,4 +154,5 @@ public class ServerThread extends Thread {
 		}
 		return null;
 	}
+	*/
 }
