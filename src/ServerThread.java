@@ -56,7 +56,15 @@ public class ServerThread extends Thread {
 
 					case "restock_wine":
 						break;
+					
+					case "get_employees":
+						ArrayList<User> employees = getEmployees();
+						out.writeObject(employees);
+						break;
 						
+					case "":
+						break;
+
 					default:
 						break;
 				}
@@ -85,6 +93,7 @@ public class ServerThread extends Thread {
 		}
 		return null;
 	}
+
 
 	public static int login(String username, String password) {
 		
@@ -178,8 +187,32 @@ public class ServerThread extends Thread {
 		}
 		return 0;
 	}
-		
 	
+	
+	public static ArrayList<User> getEmployees(){
+		Connection connection = getConnection();
+		String query = "SELECT name,surname,email FROM user WHERE permission='2'";
+		ArrayList<User> employees_list = new ArrayList<User>();
+		
+		try {
+			PreparedStatement statement = connection.prepareStatement(query);
+			ResultSet query_result = statement.executeQuery();
+
+			while(query_result.next()){
+				String name = query_result.getString("name");
+				String surname = query_result.getString("surname");
+				String email = query_result.getString("email");
+				User tmp = new User(name, surname, email, "", 2);
+				employees_list.add(tmp);
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return employees_list;
+
+	}
+	// public static int restock()
 	/*
 	public static ArrayList<Object[]> execQuery(String query, String... fields) {
 		try {
