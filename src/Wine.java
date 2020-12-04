@@ -10,6 +10,7 @@
 public class Wine {
 
 	private String name;
+	private int product_id;
 	private String producer;
 	private int year;
 	private String notes;
@@ -22,6 +23,7 @@ public class Wine {
 	public Wine(){
 		this.name = "";
 		this.producer = "";
+		this.product_id = -1;
 		this.year = -1;
 		this.notes = "";
 		this.grapes = "";
@@ -37,13 +39,14 @@ public class Wine {
 	 * @param quantity quantity of the wine. [int]
 	 * @param grapes list of the grapes. [String]
 	 */
-	public Wine(final String name, final String producer, final int year,
+	public Wine(final int id, final String name, final String producer, final int year,
 		final String notes, final int quantity, final String grapes){
 
 		this.name = name;
 		this.producer = producer;
 		this.year = year;
 		this.notes = notes;
+		this.product_id = id;
 		this.quantity = quantity;
 		this.grapes = grapes;
 	}

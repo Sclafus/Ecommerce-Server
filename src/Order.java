@@ -5,12 +5,14 @@ public class Order {
 
 	private ArrayList<Wine> items = new ArrayList<Wine>();
 	private int id;
+	private String customer;
 	private Boolean shipped;
 
 	/**
 	 * {@code Order} class constructor.
 	 */
 	public Order(){
+		this.shipped = false;
 	}
 
 	/**
@@ -19,7 +21,10 @@ public class Order {
 	 * @see Wine
 	 * @see User
 	 */
-	public Order(final Wine[] wines){
+	public Order(int id, Boolean ship, String cust, final Wine[] wines){
+		this.id = id;
+		this.shipped = ship;
+		this.customer = cust;
 		Collections.addAll(items, wines);
 	}
 
@@ -28,8 +33,16 @@ public class Order {
 	 * Gets the id of the selected {@code Order}.
 	 * @return the id of the {@code Order}. [int]
 	 */
-	public int getId() {
+	public int getId(){
 		return this.id;
+	}
+
+	/**
+	 * Gets the status of the selected {@code Order}. 
+	 * @return {@code true} if the order has been shipped, else {@code false}. [Boolean]
+	 */
+	public Boolean getStatus(){
+		return this.shipped;
 	}
 
 	/**
@@ -41,5 +54,12 @@ public class Order {
 		Wine[] wines_arr = new Wine[items.size()]; 
 		wines_arr = items.toArray(wines_arr);
 		return wines_arr;
+	}
+	
+	/**
+	 * Changes the status of the selected {@code Order} to {@code true} once the order has been shipped.
+	 */
+	public void changeStatus(){
+		this.shipped = true;
 	}
 }
