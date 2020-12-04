@@ -12,6 +12,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 public class ServerThread extends Thread {
 	private Socket socket;
@@ -127,7 +129,7 @@ public class ServerThread extends Thread {
 	public static int add_wine(String name, int year, String producer, String grapes, String notes){
 
 		Connection connection = getConnection();
-		String query = String.format("SELECT name, year, producer FROM wine WHERE name='%s', year='%d', producer='%s'",
+		String query = String.format("SELECT name, year, producer FROM wine WHERE name='%s', year=%d, producer='%s'",
 		 name, year, producer);
 		try {
 			PreparedStatement statement = connection.prepareStatement(query);
@@ -137,7 +139,7 @@ public class ServerThread extends Thread {
 				//wine has not been added yet.
 				return -1;
 			} else{
-				String query1 = String.format("INSERT INTO wine(name, year, producer, grapeWines, notes) VALUES ('%s', '%d', '%s', '%s', '%s')", 
+				String query1 = String.format("INSERT INTO wine(name, year, producer, grapeWines, notes) VALUES ('%s', %d, '%s', '%s', '%s')", 
 				name, year, producer, grapes, notes);
 
 				try{
@@ -169,7 +171,7 @@ public class ServerThread extends Thread {
 				//user has not been registered yet.
 				return -1;
 			} else{
-				String query1 = String.format("INSERT INTO user(name, surname, email, password, permission) VALUES ('%s', '%s', '%s', '%s', '%d')", 
+				String query1 = String.format("INSERT INTO user(name, surname, email, password, permission) VALUES ('%s', '%s', '%s', '%s', %d)", 
 				name,surname, mail, password, permission);
 
 				try{
@@ -188,10 +190,10 @@ public class ServerThread extends Thread {
 		return 0;
 	}
 	
-	
+
 	public static ArrayList<User> getEmployees(){
 		Connection connection = getConnection();
-		String query = "SELECT name,surname,email FROM user WHERE permission='2'";
+		String query = "SELECT name,surname,email FROM user WHERE permission=2";
 		ArrayList<User> employees_list = new ArrayList<User>();
 		
 		try {
@@ -212,6 +214,67 @@ public class ServerThread extends Thread {
 		return employees_list;
 
 	}
+
+
+	public static ArrayList<Order> getOrders(){
+		Connection connection = getConnection();
+		String query_id = "SELECT order_id FROM order";
+		ArrayList<Order> orders_list = new ArrayList<Order>();
+		
+		try {
+			PreparedStatement statement_id = connection.prepareStatement(query_id);
+			ResultSet query_result_id = statement_id.executeQuery();
+			ArrayList<Integer> order_id_duplicates = new ArrayList<Integer>();
+
+			while(query_result_id.next()){
+				order_id_duplicates.add(query_result_id.getInt("order_id"));
+			}
+
+			ArrayList<Integer> order_ids = (ArrayList<Integer>) order_id_duplicates.stream()
+			.distinct().collect(Collectors.toList());
+
+			Collections.sort(order_ids);
+			
+			for(int order_id : order_ids){
+				String query = String.format("SELECT * FROM order WHERE id=%d", order_id);
+				PreparedStatement statement = connection.prepareStatement(query);
+				ResultSet query_result = statement.executeQuery();
+				ArrayList<Wine> products = new ArrayList<Wine>();
+
+				String email = query_result.getString("email");
+				Boolean shipped = query_result.getBoolean("shipped");
+				
+				while(query_result.next()){
+					int product_id = query_result.getInt("product_id");
+					int quantity = query_result.getInt("quantity");
+
+					String query_wine = String.format("SELECT * FROM wine WHERE product_id=%d",
+					product_id);
+					PreparedStatement statement_wine = connection.prepareStatement(query_wine);
+					ResultSet query_result_wine = statement_wine.executeQuery();
+					
+					String name = query_result_wine.getString("name");
+					String producer = query_result_wine.getString("producer");
+					int year = query_result_wine.getInt("year");
+					String notes = query_result_wine.getString("notes");
+					String grapes = query_result_wine.getString("grapes");
+
+					Wine tmp = new Wine(product_id, name, producer, year, notes, quantity, grapes);
+					products.add(tmp);
+				}
+
+				Order new_order =  new Order(order_id, shipped, email, (Wine[]) products.toArray());
+				orders_list.add(new_order);
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return orders_list;
+
+	}
+
+
 	// public static int restock()
 	/*
 	public static ArrayList<Object[]> execQuery(String query, String... fields) {
