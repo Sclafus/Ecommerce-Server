@@ -1,3 +1,5 @@
+import java.io.Serializable;
+
 //TODO: JAVADOC CLASS User
 /**
  * Class {@code User} is a class that should never be instantiated.
@@ -6,8 +8,9 @@
  * @see Customer
  * @see Employee
  */
-public class User {
+public class User implements Serializable{
 	
+	private static final long serialVersionUID = -1558450048043538208L;
 	private String name;
 	private String surname;
 	private String email;
