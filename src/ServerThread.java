@@ -42,11 +42,13 @@ public class ServerThread extends Thread {
 						break;
 
 					case "register_user":
+					//TODO: int -> user
 						int register_user_result = register(msg[1], msg[2], msg[3], msg[4], 1);
 						out.writeObject(register_user_result);
 						break;
 
 					case "register_employee":
+					//TODO: int->user 
 						int register_employee_result = register(msg[1], msg[2], msg[3], msg[4], 2);
 						out.writeObject(register_employee_result);
 						break;
@@ -57,6 +59,8 @@ public class ServerThread extends Thread {
 						break;
 
 					case "restock_wine":
+						Boolean restock_wine_result = restock(Integer.parseInt(msg[1]), Integer.parseInt(msg[2]));
+						out.writeObject(restock_wine_result);
 						break;
 					
 					case "get_employees":
@@ -64,7 +68,8 @@ public class ServerThread extends Thread {
 						out.writeObject(employees);
 						break;
 						
-					case "":
+					case "search":
+
 						break;
 
 					default:
@@ -150,15 +155,10 @@ public class ServerThread extends Thread {
 				String insert_query = String.format("INSERT INTO wine(name, year, producer, grapeWines, notes) VALUES ('%s', %d, '%s', '%s', '%s')", 
 				name, year, producer, grapes, notes);
 
-				try{
-					PreparedStatement insert_statement = connection.prepareStatement(insert_query);
-					insert_statement.executeUpdate();
-				} catch (SQLException e){
-					e.printStackTrace();
-				} finally{
-					System.out.format("Wine %s %s has been added\n", name, year);
-					return true;
-				}
+				PreparedStatement insert_statement = connection.prepareStatement(insert_query);
+				insert_statement.executeUpdate();
+				System.out.format("Wine %s %s has been added\n", name, year);
+				return true;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -279,13 +279,12 @@ public class ServerThread extends Thread {
 			e.printStackTrace();
 		}
 		return orders_list;
-
 	}
-
-
-	public static void restock(String name, int year){
+	
+	
+	public static Boolean restock(int id, int new_quantity){
 		Connection connection = getConnection();
-		String query = String.format("SELECT quantity FROM wine WHERE name = '%s' and year = %d", name, year);
+		String query = String.format("SELECT quantity FROM wine WHERE product_id = %d", id);
 
 		try {
 			PreparedStatement statement = connection.prepareStatement(query);
@@ -294,12 +293,74 @@ public class ServerThread extends Thread {
 			while(query_result.next()){
 				int old_quantity = query_result.getInt("quantity"); 
 				
-				String query_restock = "UPDATE wine SET quantity = %d WHERE name = ", new_quantity;
-			
-				try {
-					PreparedStatement statement_id = connection.prepareStatement(query_id);
-					ResultSet query_result_id = statement_id.executeQuery();
-				ArrayList<Integer> order_id_duplicates = new ArrayList<Integer>();
+				String query_restock = String.format("UPDATE wine SET quantity = %d WHERE product_id = %d", new_quantity+old_quantity, id);
+				
+				PreparedStatement statement_restock = connection.prepareStatement(query_restock);
+				statement_restock.executeUpdate();
+				System.out.format("Wine %d has been restocked\n", id);
+				return true;
+			}
+		} catch (SQLException e){
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+
+	public static ArrayList<Wine> search(String name, String year_string){
+		ArrayList<Wine> search_result_list = new ArrayList<Wine>();
+		Connection connection = getConnection();
+
+		String query = "";
+		int year = -1;
+		// String query = String.format("SELECT * FROM wine WHERE (name = '%s' and year = '%s') OR (name = '%s') OR (year = '%s')", wine_name, year_string, wine_name, year_string);
+		try {
+			year = Integer.parseInt(year_string);
+
+		} catch (NumberFormatException e) {
+			//year is null
+			if(!name.equals(null)) { 
+				//case 1: name not null, year null
+				query = String.format("SELECT * FROM wine WHERE name='%s'", name);
+			} else {
+				//case 2:everything is null, return, there's nothing to search
+				return search_result_list;
+			}
+
+		} finally {
+			if(name.equals(null)) {
+				//case 3: name null, year not null 
+				query = String.format("SELECT * FROM wine WHERE year=%d", year);
+			} else {
+				//case 4: nothing is null
+				query = String.format("SELECT * FROM wine WHERE year=%d AND name='%s'", year, name);
+			}
+		}
+
+
+		
+		try{
+			PreparedStatement statement = connection.prepareStatement(query);
+			ResultSet results = statement.executeQuery();
+
+			while(results.next()){
+				int wine_product_id = results.getInt("product_id");
+				String wine_name = results.getString("name");
+				int wine_year = results.getInt("year");
+				String wine_producer = results.getString("producer");
+				String wine_grapes = results.getString("grapeWines");
+				int wine_quantity = results.getInt("quantity");
+				String wine_notes = results.getString("notes");
+				Wine wine = new Wine(wine_product_id, wine_name, wine_producer,
+				wine_year, wine_notes, wine_quantity, wine_grapes);
+				search_result_list.add(wine);
+				
+			}
+
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+		return search_result_list;
 	}
 	/*
 	public static ArrayList<Object[]> execQuery(String query, String... fields) {
