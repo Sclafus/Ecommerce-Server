@@ -22,6 +22,10 @@ public class ServerThread extends Thread {
 		this.socket = socket;
 	}
 
+	/**
+	 * Disambiguation function. Gets the input from the socket (it has to be a
+	 * String array), calls the right function, returns result.
+	 */
 	public void run() {
 
 		try {
@@ -29,6 +33,7 @@ public class ServerThread extends Thread {
 			ObjectInputStream in = new ObjectInputStream(inputStream);
 
 			try {
+				// input from the client
 				String[] msg = (String[]) in.readObject();
 				OutputStream outputStream = this.socket.getOutputStream();
 				ObjectOutputStream out = new ObjectOutputStream(outputStream);
@@ -62,8 +67,13 @@ public class ServerThread extends Thread {
 						break;
 
 					case "get_employees":
-						ArrayList<User> employees = getEmployees();
+						ArrayList<User> employees = getUsers(2);
 						out.writeObject(employees);
+						break;
+
+					case "get_users":
+						ArrayList<User> users = getUsers(1);
+						out.writeObject(users);
 						break;
 
 					case "search":
@@ -82,6 +92,12 @@ public class ServerThread extends Thread {
 		}
 	}
 
+	/**
+	 * Connects to MySQL with jdbc driver.
+	 * 
+	 * @return object connected to MySQL. [Connection]
+	 * @see Connection
+	 */
 	public static Connection getConnection() {
 		try {
 			// username and password are in clear and have all the permissions.
@@ -154,8 +170,8 @@ public class ServerThread extends Thread {
 	public static Boolean add_wine(String name, int year, String producer, String grapes, String notes) {
 
 		Connection connection = getConnection();
-		String select_query = String.format("SELECT name, year, producer FROM wine WHERE name='%s', year=%d, producer='%s'",
-				name, year, producer);
+		String select_query = String.format(
+				"SELECT name, year, producer FROM wine WHERE name='%s', year=%d, producer='%s'", name, year, producer);
 		try {
 			PreparedStatement statement = connection.prepareStatement(select_query);
 			ResultSet query_result = statement.executeQuery();
@@ -177,15 +193,16 @@ public class ServerThread extends Thread {
 	}
 
 	/**
-	 * Checks if the user with the selected email is present in the
-	 * database. Then, if not it registers the person with the selected permission.
+	 * Checks if the user with the selected email is present in the database. Then,
+	 * if not it registers the person with the selected permission.
 	 * 
 	 * @param name       the name of the {@code User}. [String]
 	 * @param surname    the surname of the {@code User}. [String]
 	 * @param email      the email of the {@code User}. [String]
 	 * @param password   the password of the {@code User}. [String]
 	 * @param permission the permission of the {@code User}. [String]
-	 * @return {@code User} object. {@code nullUser} if the account is already registered, else the correct {@code User}.
+	 * @return {@code User} object. {@code nullUser} if the account is already
+	 *         registered, else the correct {@code User}.
 	 * @see User
 	 */
 	public static User register(String name, String surname, String mail, String password, int permission) {
@@ -219,10 +236,17 @@ public class ServerThread extends Thread {
 	}
 
 	// TODO permission check, add User as a parameter
-	public static ArrayList<User> getEmployees() {
+	/**
+	 * Gets all the user with the selected permission.
+	 * 
+	 * @param permission the selected permission. [int]
+	 * @return ArrayList with all the Users. [ArrayList<User>]
+	 * @see User
+	 */
+	public static ArrayList<User> getUsers(int permission) {
 		Connection connection = getConnection();
-		String query = "SELECT name,surname,email FROM user WHERE permission=2";
-		ArrayList<User> employees_list = new ArrayList<User>();
+		String query = String.format("SELECT name,surname,email FROM user WHERE permission=%d", permission);
+		ArrayList<User> user_list = new ArrayList<User>();
 
 		try {
 			PreparedStatement statement = connection.prepareStatement(query);
@@ -232,27 +256,21 @@ public class ServerThread extends Thread {
 				String name = query_result.getString("name");
 				String surname = query_result.getString("surname");
 				String email = query_result.getString("email");
-				User employee = new User(name, surname, email, "", 2);
-				employees_list.add(employee);
+				User user = new User(name, surname, email, "", permission);
+				user_list.add(user);
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return employees_list;
+		return user_list;
 
 	}
 
 	/**
 	 * Returns the list of all the orders that have been placed.
-	 * 
-	 * @param name       the name of the {@code User}. [String]
-	 * @param surname    the surname of the {@code User}. [String]
-	 * @param email      the email of the {@code User}. [String]
-	 * @param password   the password of the {@code User}. [String]
-	 * @param permission the permission of the {@code User}. [String]
-	 * @return {@code User} object. {@code nullUser} if the account is already registered, else the correct {@code User}.
-	 * @see User
+	 * @return ArrayList with all the Orders. [ArrayList<Order>]
+	 * @see Order
 	 */
 	// TODO permission check, add User as a parameter
 	public static ArrayList<Order> getOrders() {
@@ -311,6 +329,13 @@ public class ServerThread extends Thread {
 		return orders_list;
 	}
 
+	/**
+	 * 
+	 * @param id of the {@code Wine}. [int]
+	 * @param new_quantity the quantity that we want to restock. [int]
+	 * @return {@code true} if the wine has been restocked, 
+	 * {@code false} if the wine has not been restocked for whatever reason. [Boolean]
+	 */
 	// TODO permission check, add User as a parameter
 	public static Boolean restock(int id, int new_quantity) {
 		Connection connection = getConnection();
@@ -337,7 +362,7 @@ public class ServerThread extends Thread {
 		return false;
 	}
 
-	//? regex?
+	// ? regex?
 	public static ArrayList<Wine> search(String name, String year_string) {
 		ArrayList<Wine> search_result_list = new ArrayList<Wine>();
 		Connection connection = getConnection();
@@ -361,7 +386,7 @@ public class ServerThread extends Thread {
 			if (name.equals("")) {
 				// case 3: name null, year not null
 				query = String.format("SELECT * FROM wine WHERE year=%d", year);
-			} else if(year != 0){
+			} else if (year != 0) {
 				// case 4: nothing is null
 				query = String.format("SELECT * FROM wine WHERE year=%d AND name='%s'", year, name);
 			}
@@ -391,28 +416,4 @@ public class ServerThread extends Thread {
 		return search_result_list;
 	}
 
-	/*
-	 * public static ArrayList<Object[]> execQuery(String query, String... fields) {
-	 * try { //connects to db, executes the query, gets result Connection connection
-	 * = getConnection(); PreparedStatement statement =
-	 * connection.prepareStatement(query); ResultSet query_result =
-	 * statement.executeQuery();
-	 * 
-	 * ArrayList<Object[]> result = new ArrayList<Object[]>();
-	 * 
-	 * if(fields.length > 0){ ArrayList<Object> tmp = new ArrayList<Object>();
-	 * 
-	 * checks every element of result, inserts it in tmp, tmp gets converted to an
-	 * array of strings and then cleared,
-	 * 
-	 * 
-	 * while (query_result.next()){ for (String field : fields){
-	 * tmp.add(query_result.getString(field)); } Object[] tuple_array =
-	 * tmp.toArray(); result.add(tuple_array); tmp.clear(); } return result; } else
-	 * {
-	 * 
-	 * }
-	 * 
-	 * } catch (Exception e){ e.printStackTrace(); } return null; }
-	 */
 }
