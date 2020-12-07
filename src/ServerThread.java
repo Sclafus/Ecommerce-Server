@@ -80,6 +80,11 @@ public class ServerThread extends Thread {
 						ArrayList<Wine> search_result = search(msg[1], msg[2]);
 						out.writeObject(search_result);
 						break;
+					
+					case "get_orders":
+						ArrayList<Order> orders = getOrders();
+						out.writeObject(orders);
+						break;
 
 					default:
 						break;
@@ -208,14 +213,14 @@ public class ServerThread extends Thread {
 	public static User register(String name, String surname, String mail, String password, int permission) {
 
 		Connection connection = getConnection();
-		String query = String.format("SELECT mail FROM user WHERE mail='%s'", mail);
+		String query = String.format("SELECT email FROM user WHERE email='%s'", mail);
 		User nullUser = new User();
 
 		try {
 			PreparedStatement statement = connection.prepareStatement(query);
 			ResultSet query_result = statement.executeQuery();
 
-			if (!query_result.next()) {
+			if (query_result.next()) {
 				// user has already been registered.
 				return nullUser;
 			} else {
