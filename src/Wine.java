@@ -1,3 +1,5 @@
+import java.io.Serializable;
+
 //TODO: FIX JAVADOC
 /**
  * Abstraction of a determined Wine. Every wine has a name, 
@@ -7,8 +9,9 @@
  * restock.
  * @see Customer
  */
-public class Wine {
+public class Wine implements Serializable{
 
+	private static final long serialVersionUID = 1727284212719259730L;
 	private String name;
 	private int product_id;
 	private String producer;

@@ -42,14 +42,12 @@ public class ServerThread extends Thread {
 						break;
 
 					case "register_user":
-						// TODO: int -> user
-						int register_user_result = register(msg[1], msg[2], msg[3], msg[4], 1);
+						User register_user_result = register(msg[1], msg[2], msg[3], msg[4], 1);
 						out.writeObject(register_user_result);
 						break;
 
 					case "register_employee":
-						// TODO: int->user
-						int register_employee_result = register(msg[1], msg[2], msg[3], msg[4], 2);
+						User register_employee_result = register(msg[1], msg[2], msg[3], msg[4], 2);
 						out.writeObject(register_employee_result);
 						break;
 
@@ -141,25 +139,28 @@ public class ServerThread extends Thread {
 	}
 
 	// TODO permission check, add User as a parameter
+	// TODO Finish this javadoc
 	/**
 	 * 
 	 * @param name     of the {@code Wine}. [String]
 	 * @param year     of production of the {@code Wine}. [int]
 	 * @param producer of the {@code Wine}. [int]
 	 * @param grapes   used for the {@code Wine}. [String]
-	 * @param notes
-	 * @return [Boolean]
+	 * @param notes    notes for the {@code Wine}. [String]
+	 * @return {@code true} if the operation is successfull, else {@code false}.
+	 *         [Boolean]
+	 * @see Wine
 	 */
 	public static Boolean add_wine(String name, int year, String producer, String grapes, String notes) {
 
 		Connection connection = getConnection();
-		String query = String.format("SELECT name, year, producer FROM wine WHERE name='%s', year=%d, producer='%s'",
+		String select_query = String.format("SELECT name, year, producer FROM wine WHERE name='%s', year=%d, producer='%s'",
 				name, year, producer);
 		try {
-			PreparedStatement statement = connection.prepareStatement(query);
+			PreparedStatement statement = connection.prepareStatement(select_query);
 			ResultSet query_result = statement.executeQuery();
 
-			if (query_result.next()) {
+			if (!query_result.next()) {
 				String insert_query = String.format(
 						"INSERT INTO wine(name, year, producer, grapeWines, notes) VALUES ('%s', %d, '%s', '%s', '%s')",
 						name, year, producer, grapes, notes);
@@ -175,38 +176,49 @@ public class ServerThread extends Thread {
 		return false;
 	}
 
-	public static int register(String name, String surname, String mail, String password, int permission) {
+	/**
+	 * Checks if the user with the selected email is present in the
+	 * database. Then, if not it registers the person with the selected permission.
+	 * 
+	 * @param name       the name of the {@code User}. [String]
+	 * @param surname    the surname of the {@code User}. [String]
+	 * @param email      the email of the {@code User}. [String]
+	 * @param password   the password of the {@code User}. [String]
+	 * @param permission the permission of the {@code User}. [String]
+	 * @return {@code User} object. {@code nullUser} if the account is already registered, else the correct {@code User}.
+	 * @see User
+	 */
+	public static User register(String name, String surname, String mail, String password, int permission) {
 
 		Connection connection = getConnection();
 		String query = String.format("SELECT mail FROM user WHERE mail='%s'", mail);
+		User nullUser = new User();
+
 		try {
 			PreparedStatement statement = connection.prepareStatement(query);
 			ResultSet query_result = statement.executeQuery();
 
 			if (!query_result.next()) {
-				// user has not been registered yet.
-				return -1;
+				// user has already been registered.
+				return nullUser;
 			} else {
 				String query1 = String.format(
 						"INSERT INTO user(name, surname, email, password, permission) VALUES ('%s', '%s', '%s', '%s', %d)",
 						name, surname, mail, password, permission);
 
-				try {
-					PreparedStatement statement1 = connection.prepareStatement(query1);
-					statement1.executeUpdate();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				} finally {
-					System.out.format("User %s has been added\n", mail);
-				}
-				return 0;
+				PreparedStatement statement1 = connection.prepareStatement(query1);
+				statement1.executeUpdate();
+				User newUser = new User(name, surname, mail, password, permission);
+				System.out.format("User %s has been added\n", mail);
+				return newUser;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return 0;
+		return nullUser;
 	}
 
+	// TODO permission check, add User as a parameter
 	public static ArrayList<User> getEmployees() {
 		Connection connection = getConnection();
 		String query = "SELECT name,surname,email FROM user WHERE permission=2";
@@ -231,6 +243,18 @@ public class ServerThread extends Thread {
 
 	}
 
+	/**
+	 * Returns the list of all the orders that have been placed.
+	 * 
+	 * @param name       the name of the {@code User}. [String]
+	 * @param surname    the surname of the {@code User}. [String]
+	 * @param email      the email of the {@code User}. [String]
+	 * @param password   the password of the {@code User}. [String]
+	 * @param permission the permission of the {@code User}. [String]
+	 * @return {@code User} object. {@code nullUser} if the account is already registered, else the correct {@code User}.
+	 * @see User
+	 */
+	// TODO permission check, add User as a parameter
 	public static ArrayList<Order> getOrders() {
 		Connection connection = getConnection();
 		String query_id = "SELECT order_id FROM order";
@@ -287,6 +311,7 @@ public class ServerThread extends Thread {
 		return orders_list;
 	}
 
+	// TODO permission check, add User as a parameter
 	public static Boolean restock(int id, int new_quantity) {
 		Connection connection = getConnection();
 		String query = String.format("SELECT quantity FROM wine WHERE product_id = %d", id);
@@ -312,18 +337,19 @@ public class ServerThread extends Thread {
 		return false;
 	}
 
+	//? regex?
 	public static ArrayList<Wine> search(String name, String year_string) {
 		ArrayList<Wine> search_result_list = new ArrayList<Wine>();
 		Connection connection = getConnection();
-
 		String query = "";
-		int year = -1;
+		int year = 0;
+
 		try {
 			year = Integer.parseInt(year_string);
 
 		} catch (NumberFormatException e) {
 			// year is null
-			if (!name.equals(null)) {
+			if (!name.equals("")) {
 				// case 1: name not null, year null
 				query = String.format("SELECT * FROM wine WHERE name='%s'", name);
 			} else {
@@ -332,14 +358,15 @@ public class ServerThread extends Thread {
 			}
 
 		} finally {
-			if (name.equals(null)) {
+			if (name.equals("")) {
 				// case 3: name null, year not null
 				query = String.format("SELECT * FROM wine WHERE year=%d", year);
-			} else {
+			} else if(year != 0){
 				// case 4: nothing is null
 				query = String.format("SELECT * FROM wine WHERE year=%d AND name='%s'", year, name);
 			}
 		}
+		System.out.println(query);
 
 		try {
 			PreparedStatement statement = connection.prepareStatement(query);
