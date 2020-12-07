@@ -28,6 +28,14 @@ public class Order {
 		Collections.addAll(items, wines);
 	}
 
+	/**
+	 * Gets the email of the customer of the selected {@code Order}.
+	 * @return customer's email. [String]
+	 * @see User
+	 */
+	public String getCustomer(){
+		return this.customer;
+	}
 	
 	/**
 	 * Gets the id of the selected {@code Order}.
