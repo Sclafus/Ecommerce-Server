@@ -13,9 +13,11 @@ public class Server {
 
 		ServerSocket serverSocket = new ServerSocket(PORT);
 		System.out.println("Server ready for connections!");
+		int i = 0;
 		
 		while(true){
 			Socket socket = serverSocket.accept();
+			System.out.format("Connection %d\n", ++i);
 			new ServerThread(socket).start();
 		}
 		
