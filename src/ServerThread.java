@@ -57,7 +57,7 @@ public class ServerThread extends Thread {
 						break;
 
 					case "add_wine":
-						Boolean add_wine_result = add_wine(msg[1], Integer.parseInt(msg[2]), msg[3], msg[4], msg[5]);
+						Wine add_wine_result = addWine(msg[1], Integer.parseInt(msg[2]), msg[3], msg[4], msg[5]);
 						out.writeObject(add_wine_result);
 						break;
 
@@ -80,7 +80,7 @@ public class ServerThread extends Thread {
 						ArrayList<Wine> search_result = search(msg[1], msg[2]);
 						out.writeObject(search_result);
 						break;
-					
+
 					case "get_orders":
 						ArrayList<Order> orders = getOrders();
 						out.writeObject(orders);
@@ -159,7 +159,6 @@ public class ServerThread extends Thread {
 		return nullUser;
 	}
 
-	// TODO permission check, add User as a parameter
 	// TODO Finish this javadoc
 	/**
 	 * 
@@ -172,11 +171,13 @@ public class ServerThread extends Thread {
 	 *         [Boolean]
 	 * @see Wine
 	 */
-	public static Boolean add_wine(String name, int year, String producer, String grapes, String notes) {
+	public static Wine addWine(String name, int year, String producer, String grapes, String notes) {
+		Wine nullWine = new Wine();
 
 		Connection connection = getConnection();
 		String select_query = String.format(
-				"SELECT name, year, producer FROM wine WHERE name='%s', year=%d, producer='%s'", name, year, producer);
+				"SELECT name, year, producer FROM wine WHERE name='%s' AND year=%d AND producer='%s'", name, year,
+				producer);
 		try {
 			PreparedStatement statement = connection.prepareStatement(select_query);
 			ResultSet query_result = statement.executeQuery();
@@ -189,12 +190,21 @@ public class ServerThread extends Thread {
 				PreparedStatement insert_statement = connection.prepareStatement(insert_query);
 				insert_statement.executeUpdate();
 				System.out.format("Wine %s %s has been added\n", name, year);
-				return true;
+
+				// building Wine object
+				String query_id = String.format(
+						"SELECT product_id FROM wine WHERE name='%s' AND year=%d AND producer=%s AND grapeWines=%s AND notes=%s",
+						name, year, producer, grapes, notes);
+				PreparedStatement statement_id = connection.prepareStatement(query_id);
+				ResultSet query_id_result = statement_id.executeQuery();
+				int id = query_id_result.getInt("product_id");
+				Wine new_wine = new Wine(id, name, producer, year, notes, 0, grapes);
+				return new_wine;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return nullWine;
 	}
 
 	/**
@@ -240,7 +250,6 @@ public class ServerThread extends Thread {
 		return nullUser;
 	}
 
-	// TODO permission check, add User as a parameter
 	/**
 	 * Gets all the user with the selected permission.
 	 * 
@@ -274,10 +283,10 @@ public class ServerThread extends Thread {
 
 	/**
 	 * Returns the list of all the orders that have been placed.
+	 * 
 	 * @return ArrayList with all the Orders. [ArrayList<Order>]
 	 * @see Order
 	 */
-	// TODO permission check, add User as a parameter
 	public static ArrayList<Order> getOrders() {
 		Connection connection = getConnection();
 		String query_id = "SELECT order_id FROM order";
@@ -336,12 +345,11 @@ public class ServerThread extends Thread {
 
 	/**
 	 * 
-	 * @param id of the {@code Wine}. [int]
+	 * @param id           of the {@code Wine}. [int]
 	 * @param new_quantity the quantity that we want to restock. [int]
-	 * @return {@code true} if the wine has been restocked, 
-	 * {@code false} if the wine has not been restocked for whatever reason. [Boolean]
+	 * @return {@code true} if the wine has been restocked, {@code false} if the
+	 *         wine has not been restocked for whatever reason. [Boolean]
 	 */
-	// TODO permission check, add User as a parameter
 	public static Boolean restock(int id, int new_quantity) {
 		Connection connection = getConnection();
 		String query = String.format("SELECT quantity FROM wine WHERE product_id = %d", id);
@@ -368,6 +376,7 @@ public class ServerThread extends Thread {
 	}
 
 	// ? regex?
+	//TODO javadoc
 	public static ArrayList<Wine> search(String name, String year_string) {
 		ArrayList<Wine> search_result_list = new ArrayList<Wine>();
 		Connection connection = getConnection();
