@@ -184,22 +184,25 @@ public class ServerThread extends Thread {
 
 			if (!query_result.next()) {
 				String insert_query = String.format(
-						"INSERT INTO wine(name, year, producer, grapeWines, notes) VALUES ('%s', %d, '%s', '%s', '%s')",
+						"INSERT INTO wine(name, year, producer, grapeWines, notes, quantity) VALUES ('%s', %d, '%s', '%s', '%s', 0)",
 						name, year, producer, grapes, notes);
 
 				PreparedStatement insert_statement = connection.prepareStatement(insert_query);
 				insert_statement.executeUpdate();
-				System.out.format("Wine %s %s has been added\n", name, year);
 
 				// building Wine object
 				String query_id = String.format(
 						"SELECT product_id FROM wine WHERE name='%s' AND year=%d AND producer='%s' AND grapeWines='%s' AND notes='%s'",
 						name, year, producer, grapes, notes);
+
 				PreparedStatement statement_id = connection.prepareStatement(query_id);
 				ResultSet query_id_result = statement_id.executeQuery();
-				int id = query_id_result.getInt("product_id");
-				Wine new_wine = new Wine(id, name, producer, year, notes, 0, grapes);
-				return new_wine;
+				if(query_id_result.next()){
+					int id = query_id_result.getInt("product_id");
+					System.out.format("Wine %s %s has been added\n", name, year);
+					Wine new_wine = new Wine(id, name, producer, year, notes, 0, grapes);
+					return new_wine;
+				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -376,7 +379,7 @@ public class ServerThread extends Thread {
 	}
 
 	// ? regex?
-	//TODO javadoc
+	// TODO javadoc
 	public static ArrayList<Wine> search(String name, String year_string) {
 		ArrayList<Wine> search_result_list = new ArrayList<Wine>();
 		Connection connection = getConnection();
