@@ -8,7 +8,8 @@ public class Server {
 	public static void main(String[] args) throws IOException {
 		new Server().run();
 	}
-
+	
+	@SuppressWarnings({ "resource" })
 	public void run() throws IOException {
 
 		ServerSocket serverSocket = new ServerSocket(PORT);
