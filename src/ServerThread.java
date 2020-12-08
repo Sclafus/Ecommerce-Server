@@ -108,7 +108,7 @@ public class ServerThread extends Thread {
 			// username and password are in clear and have all the permissions.
 			// this is ok since we are not in production 🤷‍♂️
 			String driver = "com.mysql.cj.jdbc.Driver";
-			String url = "jdbc:mysql://localhost:3306/assignment3";
+			String url = "jdbc:mysql://localhost:3306/assignment3?useLegacyDatetimeCode=false&serverTimezone=UTC";
 			String username = "root";
 			String password = "admin";
 			Class.forName(driver);
