@@ -193,7 +193,7 @@ public class ServerThread extends Thread {
 
 				// building Wine object
 				String query_id = String.format(
-						"SELECT product_id FROM wine WHERE name='%s' AND year=%d AND producer=%s AND grapeWines=%s AND notes=%s",
+						"SELECT product_id FROM wine WHERE name='%s' AND year=%d AND producer='%s' AND grapeWines='%s' AND notes='%s'",
 						name, year, producer, grapes, notes);
 				PreparedStatement statement_id = connection.prepareStatement(query_id);
 				ResultSet query_id_result = statement_id.executeQuery();
