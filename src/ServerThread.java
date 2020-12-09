@@ -160,16 +160,19 @@ public class ServerThread extends Thread {
 	}
 
 	/**
-	 * Allows to add a wine to the wine table contained in the database. It checks first if the wine the employee is trying 
-	 * to add is already present or not. If so, it returns a nullWine (operation not successful),
-	 * otherwise it adds the new wine to the database and then creates the object {@code Wine} of the wine just added.
+	 * Allows to add a wine to the wine table contained in the database. It checks
+	 * first if the wine the employee is trying to add is already present or not. If
+	 * so, it returns a nullWine (operation not successful), otherwise it adds the
+	 * new wine to the database and then creates the object {@code Wine} of the wine
+	 * just added.
+	 * 
 	 * @param name     of the {@code Wine}. [String]
 	 * @param year     of production of the {@code Wine}. [int]
 	 * @param producer of the {@code Wine}. [int]
 	 * @param grapes   used for the {@code Wine}. [String]
 	 * @param notes    notes for the {@code Wine}. [String]
-	 * @return the object {@code Wine} of the wine inserted if the insertion has been successful or 
-	 * 			a nullWine if not. [Wine]
+	 * @return the object {@code Wine} of the wine inserted if the insertion has
+	 *         been successful or a nullWine if not. [Wine]
 	 * @see Wine
 	 */
 	public static Wine addWine(String name, int year, String producer, String grapes, String notes) {
@@ -198,7 +201,7 @@ public class ServerThread extends Thread {
 
 				PreparedStatement statement_id = connection.prepareStatement(query_id);
 				ResultSet query_id_result = statement_id.executeQuery();
-				if(query_id_result.next()){
+				if (query_id_result.next()) {
 					int id = query_id_result.getInt("product_id");
 					System.out.format("Wine %s %s has been added\n", name, year);
 					Wine new_wine = new Wine(id, name, producer, year, notes, 0, grapes);
@@ -348,9 +351,9 @@ public class ServerThread extends Thread {
 	}
 
 	/**
-	 * Allows to restock a wine by adding to the existing quantity a new quantity 
-	 * specified by the employee. It returns the {@code true} if the operation is successful, 
-	 * otherwise it returns the {@code false}.
+	 * Allows to restock a wine by adding to the existing quantity a new quantity
+	 * specified by the employee. It returns the {@code true} if the operation is
+	 * successful, otherwise it returns the {@code false}.
 	 * 
 	 * @param id           of the {@code Wine}. [int]
 	 * @param new_quantity the quantity that we want to restock. [int]
@@ -383,12 +386,12 @@ public class ServerThread extends Thread {
 	}
 
 	/**
-	 * Responds with a list with all the wines corriponding to the given search constraints.
-	 * The research can be done either by year, by name or both of the {@code Wine}.
-	 * Once the wines are found, their corrisponding objects are added to a list
-	 * which is then returned.
+	 * Responds with a list with all the wines corriponding to the given search
+	 * constraints. The research can be done either by year, by name or both of the
+	 * {@code Wine}. Once the wines are found, their corrisponding objects are added
+	 * to a list which is then returned.
 	 * 
-	 * @param name of the wine to search. [String]
+	 * @param name        of the wine to search. [String]
 	 * @param year_string of the wine to search. [String]
 	 * @return ArrayList with all the Wines found. [ArrayList<Wine>]
 	 * @see Wine
