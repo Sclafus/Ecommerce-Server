@@ -339,21 +339,21 @@ public class ServerThread extends Thread {
 				String email ="";
 				Boolean shipped = false;
 				while (query_result.next()) {
-					System.out.println("asdasdasd");
 					email = query_result.getString("email");
 					shipped = query_result.getBoolean("shipped");
 					int product_id = query_result.getInt("product_id");
 					int quantity = query_result.getInt("quantity");
+					
 					String query_wine = String.format("SELECT * FROM assignment3.wine WHERE product_id=%d", product_id);
 					PreparedStatement statement_wine = connection.prepareStatement(query_wine);
 					ResultSet query_result_wine = statement_wine.executeQuery();
-					if (query_result_wine.next()) {
+
+					while (query_result_wine.next()) {
 						String name = query_result_wine.getString("name");
 						String producer = query_result_wine.getString("producer");
 						int year = query_result_wine.getInt("year");
 						String notes = query_result_wine.getString("notes");
-						String grapes = query_result_wine.getString("grapes");
-						System.out.println(name);
+						String grapes = query_result_wine.getString("grapeWines");
 						Wine tmp = new Wine(product_id, name, producer, year, notes, quantity, grapes);
 						products.add(tmp);
 					}
