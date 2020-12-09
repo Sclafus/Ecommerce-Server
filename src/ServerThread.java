@@ -159,16 +159,19 @@ public class ServerThread extends Thread {
 		return nullUser;
 	}
 
-	// TODO Finish this javadoc
+	// TODO check javadoc
 	/**
-	 * 
+	 * Allows to add a wine to the database containing all the wines visible on
+	 * the ecommerce search section. It checks first if the wine the employee is trying 
+	 * to add has already been added or not. If yes, it returns a nullWine (operation not successful),
+	 * if not it adds the new wine to the database and then creates the object {@code Wine} of the wine just added.
 	 * @param name     of the {@code Wine}. [String]
 	 * @param year     of production of the {@code Wine}. [int]
 	 * @param producer of the {@code Wine}. [int]
 	 * @param grapes   used for the {@code Wine}. [String]
 	 * @param notes    notes for the {@code Wine}. [String]
-	 * @return {@code true} if the operation is successfull, else {@code false}.
-	 *         [Boolean]
+	 * @return the object {@code Wine} of the wine inserted if the insertion has been successful or 
+	 * 			a nullWine if not. [Wine]
 	 * @see Wine
 	 */
 	public static Wine addWine(String name, int year, String producer, String grapes, String notes) {
@@ -254,7 +257,7 @@ public class ServerThread extends Thread {
 	}
 
 	/**
-	 * Gets all the user with the selected permission.
+	 * Gets all the users with the selected permission.
 	 * 
 	 * @param permission the selected permission. [int]
 	 * @return ArrayList with all the Users. [ArrayList<User>]
@@ -379,7 +382,18 @@ public class ServerThread extends Thread {
 	}
 
 	// ? regex?
-	// TODO javadoc
+	// TODO check javadoc
+	/**
+	 * Displays all the wines corriponding to the given search constraints.
+	 * The search can be done by year of the {@code Wine}, by name of the {@code Wine}
+	 * or both. Once the wines are found, their corrisponding objects are added to a list
+	 * which is then returned by the method.
+	 * 
+	 * @param name of the wine to search. [String]
+	 * @param year_string of the wine to search. [String]
+	 * @return ArrayList with all the Wines found. [ArrayList<Wine>]
+	 * @see Wine
+	 */
 	public static ArrayList<Wine> search(String name, String year_string) {
 		ArrayList<Wine> search_result_list = new ArrayList<Wine>();
 		Connection connection = getConnection();
