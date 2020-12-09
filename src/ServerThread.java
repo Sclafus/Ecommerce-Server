@@ -429,18 +429,16 @@ public class ServerThread extends Thread {
 				query = String.format("SELECT * FROM wine WHERE name='%s'", name);
 			} else {
 				// case 2:everything is null, return, there's nothing to search
-				return search_result_list;
+				query = "SELECT * FROM wine";
 			}
 
 		} finally {
-			if (name.equals("") && year != 0) {
+			if (name.equals("") && year !=0) {
 				// case 3: name null, year not null
 				query = String.format("SELECT * FROM wine WHERE year=%d", year);
-			} else if(!name.equals("") && year != 0){
+			} else if (year != 0) {
 				// case 4: nothing is null
 				query = String.format("SELECT * FROM wine WHERE year=%d AND name='%s'", year, name);
-			} else {
-				query = "SELECT * FROM wine";
 			}
 		}
 		System.out.println(query);
