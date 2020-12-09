@@ -337,7 +337,7 @@ public class ServerThread extends Thread {
 					products.add(tmp);
 				}
 
-				Order new_order = new Order(order_id, shipped, email, (Wine[]) products.toArray());
+				Order new_order = new Order(order_id, shipped, email, products);
 				orders_list.add(new_order);
 			}
 
