@@ -382,8 +382,6 @@ public class ServerThread extends Thread {
 		return false;
 	}
 
-	// ? regex?
-	// TODO check javadoc
 	/**
 	 * Responds with a list with all the wines corriponding to the given search constraints.
 	 * The research can be done either by year, by name or both of the {@code Wine}.
