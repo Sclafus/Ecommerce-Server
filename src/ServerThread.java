@@ -161,10 +161,9 @@ public class ServerThread extends Thread {
 
 	// TODO check javadoc
 	/**
-	 * Allows to add a wine to the database containing all the wines visible on
-	 * the ecommerce search section. It checks first if the wine the employee is trying 
-	 * to add has already been added or not. If yes, it returns a nullWine (operation not successful),
-	 * if not it adds the new wine to the database and then creates the object {@code Wine} of the wine just added.
+	 * Allows to add a wine to the wine table contained in the database. It checks first if the wine the employee is trying 
+	 * to add is already present or not. If so, it returns a nullWine (operation not successful),
+	 * otherwise it adds the new wine to the database and then creates the object {@code Wine} of the wine just added.
 	 * @param name     of the {@code Wine}. [String]
 	 * @param year     of production of the {@code Wine}. [int]
 	 * @param producer of the {@code Wine}. [int]
