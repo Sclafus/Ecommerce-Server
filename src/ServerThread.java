@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
+import javax.swing.text.Highlighter.Highlight;
+
 public class ServerThread extends Thread {
 	private Socket socket;
 
@@ -94,6 +96,11 @@ public class ServerThread extends Thread {
 					case "get_wines":
 						ArrayList<Wine> wines = search("", "");
 						out.writeObject(wines);
+						break;
+
+						case "add_to_cart":
+						Boolean add_to_cart_result = addToCart(msg[1], Integer.parseInt(msg[2]), Integer.parseInt(msg[3]));
+						out.writeObject(add_to_cart_result);
 						break;
 
 					default:
@@ -300,7 +307,7 @@ public class ServerThread extends Thread {
 
 	// TODO fix javadoc
 	/**
-	 * Returns the list of all the orders that have been placed.
+	 * Returns the list of the orders.  that have been placed.
 	 * 
 	 * @return ArrayList with all the Orders. [ArrayList<Order>]
 	 * @see Order
@@ -379,6 +386,7 @@ public class ServerThread extends Thread {
 	 * @param new_quantity the quantity that we want to restock. [int]
 	 * @return {@code true} if the wine has been restocked, {@code false} if the
 	 *         wine has not been restocked for whatever reason. [Boolean]
+	 * @see Wine
 	 */
 	public static Boolean restock(int id, int new_quantity) {
 		Connection connection = getConnection();
@@ -405,7 +413,6 @@ public class ServerThread extends Thread {
 		return false;
 	}
 
-	// TODO fix javadoc
 	/**
 	 * Responds with a list with all the wines corriponding to the given search
 	 * constraints. The research can be done either by year, by name or both of the
@@ -469,5 +476,32 @@ public class ServerThread extends Thread {
 		return search_result_list;
 	}
 
-	// TODO add to cart
-}
+	/**
+	 * Allows to restock a wine by adding to the existing quantity a new quantity
+	 * specified by the employee. It returns the {@code true} if the operation is
+	 * successful, otherwise it returns the {@code false}.
+	 * 
+	 * @param email        of the {@code User} adding to the cart. [String]
+	 * @param id           of the {@code Wine}. [int]
+	 * @param quantity     the quantity that the {@code User} wants to buy. [int]
+	 * @return {@code true} if the wine has been added to the cart, {@code false} if the
+	 *         wine has not been added to the cart for whatever reason. [Boolean]
+	 * @see User
+	 * @see Wine
+	 */
+	public static Boolean addToCart(String email, int id, int quantity){
+		Connection connection = getConnection();
+		String query = String.format(
+						"INSERT INTO cart(email, product_id, quantity) VALUES ('%s', %d, %d)",
+						email, id, quantity);
+		try{
+			PreparedStatement statement = connection.prepareStatement(query);
+			statement.executeUpdate();
+			return true;
+
+		} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+		}				
+	}
