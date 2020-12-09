@@ -159,7 +159,6 @@ public class ServerThread extends Thread {
 		return nullUser;
 	}
 
-	// TODO check javadoc
 	/**
 	 * Allows to add a wine to the wine table contained in the database. It checks first if the wine the employee is trying 
 	 * to add is already present or not. If so, it returns a nullWine (operation not successful),
@@ -347,7 +346,7 @@ public class ServerThread extends Thread {
 		}
 		return orders_list;
 	}
-//TODO check javadock
+
 	/**
 	 * Allows to restock a wine by adding to the existing quantity a new quantity 
 	 * specified by the employee. It returns the {@code true} if the operation is successful, 
@@ -386,9 +385,9 @@ public class ServerThread extends Thread {
 	// ? regex?
 	// TODO check javadoc
 	/**
-	 * Displays all the wines corriponding to the given search constraints.
-	 * The search can be done by year of the {@code Wine}, by name of the {@code Wine}
-	 * or both. Once the wines are found, their corrisponding objects are added to a list
+	 * Responds with a list with all the wines corriponding to the given search constraints.
+	 * The research can be done either by year, by name or both of the {@code Wine}.
+	 * Once the wines are found, their corrisponding objects are added to a list
 	 * which is then returned.
 	 * 
 	 * @param name of the wine to search. [String]
