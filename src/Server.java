@@ -8,19 +8,19 @@ public class Server {
 	public static void main(String[] args) throws IOException {
 		new Server().run();
 	}
-	
+
 	@SuppressWarnings({ "resource" })
 	public void run() throws IOException {
 
 		ServerSocket serverSocket = new ServerSocket(PORT);
 		System.out.println("Server ready for connections!");
 		int i = 0;
-		
-		while(true){
+
+		while (true) {
 			Socket socket = serverSocket.accept();
 			System.out.format("Connection %d\n", ++i);
 			new ServerThread(socket).start();
 		}
-		
+
 	}
 }
