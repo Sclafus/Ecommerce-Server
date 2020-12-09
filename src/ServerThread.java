@@ -85,6 +85,11 @@ public class ServerThread extends Thread {
 						ArrayList<Order> orders = getOrders();
 						out.writeObject(orders);
 						break;
+					
+					case "get_orders_user":
+						ArrayList<Order> orders2 = getOrders(msg[1]);
+						out.writeObject(orders2);
+						break;
 
 					default:
 						break;
@@ -291,10 +296,16 @@ public class ServerThread extends Thread {
 	 * @return ArrayList with all the Orders. [ArrayList<Order>]
 	 * @see Order
 	 */
-	public static ArrayList<Order> getOrders() {
+	public static ArrayList<Order> getOrders(String... user) {
 		Connection connection = getConnection();
-		String query_id = "SELECT order_id FROM order";
 		ArrayList<Order> orders_list = new ArrayList<Order>();
+
+		String query_id = "";
+		if(user.length == 0){
+			query_id = "SELECT order_id FROM order";
+		} else {
+			query_id = String.format("SELECT order_id FROM order WHERE email='%s'", user[0]);
+		}
 
 		try {
 			PreparedStatement statement_id = connection.prepareStatement(query_id);
