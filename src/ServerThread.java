@@ -15,8 +15,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
-import javax.swing.text.Highlighter.Highlight;
-
 public class ServerThread extends Thread {
 	private Socket socket;
 
