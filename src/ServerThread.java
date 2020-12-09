@@ -441,7 +441,6 @@ public class ServerThread extends Thread {
 				query = String.format("SELECT * FROM wine WHERE year=%d AND name='%s'", year, name);
 			}
 		}
-		System.out.println(query);
 
 		try {
 			PreparedStatement statement = connection.prepareStatement(query);
