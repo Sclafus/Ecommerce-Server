@@ -85,12 +85,12 @@ public class ServerThread extends Thread {
 						ArrayList<Order> orders = getOrders();
 						out.writeObject(orders);
 						break;
-					
+
 					case "get_orders_user":
 						ArrayList<Order> orders2 = getOrders(msg[1]);
 						out.writeObject(orders2);
 						break;
-					
+
 					case "get_wines":
 						ArrayList<Wine> wines = search("", "");
 						out.writeObject(wines);
@@ -309,7 +309,7 @@ public class ServerThread extends Thread {
 		ArrayList<Order> orders_list = new ArrayList<Order>();
 
 		String query_id = "";
-		if(user.length == 0){
+		if (user.length == 0) {
 			query_id = "SELECT order_id FROM order";
 		} else {
 			query_id = String.format("SELECT order_id FROM order WHERE email='%s'", user[0]);
@@ -401,7 +401,7 @@ public class ServerThread extends Thread {
 		return false;
 	}
 
-	//TODO fix javadoc
+	// TODO fix javadoc
 	/**
 	 * Responds with a list with all the wines corriponding to the given search
 	 * constraints. The research can be done either by year, by name or both of the
@@ -433,7 +433,7 @@ public class ServerThread extends Thread {
 			}
 
 		} finally {
-			if (name.equals("") && year !=0) {
+			if (name.equals("") && year != 0) {
 				// case 3: name null, year not null
 				query = String.format("SELECT * FROM wine WHERE year=%d", year);
 			} else if (year != 0) {
@@ -466,5 +466,5 @@ public class ServerThread extends Thread {
 		return search_result_list;
 	}
 
-	//TODO add to cart
+	// TODO add to cart
 }
