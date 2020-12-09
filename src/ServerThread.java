@@ -348,8 +348,11 @@ public class ServerThread extends Thread {
 		}
 		return orders_list;
 	}
-
+//TODO check javadock
 	/**
+	 * Allows to restock a wine by adding to the existing quantity a new quantity 
+	 * specified by the employee. It returns the {@code true} if the operation is successful, 
+	 * otherwise it returns the {@code false}.
 	 * 
 	 * @param id           of the {@code Wine}. [int]
 	 * @param new_quantity the quantity that we want to restock. [int]
@@ -387,7 +390,7 @@ public class ServerThread extends Thread {
 	 * Displays all the wines corriponding to the given search constraints.
 	 * The search can be done by year of the {@code Wine}, by name of the {@code Wine}
 	 * or both. Once the wines are found, their corrisponding objects are added to a list
-	 * which is then returned by the method.
+	 * which is then returned.
 	 * 
 	 * @param name of the wine to search. [String]
 	 * @param year_string of the wine to search. [String]
