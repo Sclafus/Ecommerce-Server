@@ -519,11 +519,12 @@ public class ServerThread extends Thread {
 		return false;
 	}
 
-	//TODO fix, it doesn't work 😢
+	// TODO fix, it doesn't work 😢
 	public static ArrayList<Wine> getNotifications(String email) {
 		Connection connection = getConnection();
 		ArrayList<Wine> notification_list = new ArrayList<Wine>();
-		String query_select_notification = String.format("SELECT product_id FROM assignment3.notification WHERE email='%s'", email);
+		String query_select_notification = String
+				.format("SELECT product_id FROM assignment3.notification WHERE email='%s'", email);
 
 		try {
 			PreparedStatement select_notification_statement = connection.prepareStatement(query_select_notification);
@@ -531,7 +532,8 @@ public class ServerThread extends Thread {
 
 			while (result_select_notification.next()) {
 				int product_id = result_select_notification.getInt("product_id");
-				String query_select_wine = String.format("SELECT * FROM assignment3.wine WHERE product_id=%d", product_id);
+				String query_select_wine = String.format("SELECT * FROM assignment3.wine WHERE product_id=%d",
+						product_id);
 				PreparedStatement select_wine_statement = connection.prepareStatement(query_select_wine);
 				ResultSet result_select_wine = select_wine_statement.executeQuery();
 
@@ -546,7 +548,8 @@ public class ServerThread extends Thread {
 					notification_list.add(wine);
 				}
 			}
-			String delete_notification_query = String.format("DELETE FROM assignment3.notification WHERE email='%s'", email);
+			String delete_notification_query = String.format("DELETE FROM assignment3.notification WHERE email='%s'",
+					email);
 			PreparedStatement delete_query_statement = connection.prepareStatement(delete_notification_query);
 			delete_query_statement.executeUpdate();
 		} catch (Exception e) {
@@ -626,54 +629,54 @@ public class ServerThread extends Thread {
 		return nullOrder;
 	}
 
-public static ArrayList<Wine> displayCart(String email){
-	ArrayList<Wine> display_cart_list = new ArrayList<Wine>();
+	public static ArrayList<Wine> displayCart(String email) {
+		ArrayList<Wine> display_cart_list = new ArrayList<Wine>();
 
-	Connection connection = getConnection();
-	String get_cart_query = String.format("SELECT * FROM cart WHERE email = '%s'", email);
+		Connection connection = getConnection();
+		String get_cart_query = String.format("SELECT * FROM cart WHERE email = '%s'", email);
 
-	
-	try {
-		PreparedStatement cart_statement = connection.prepareStatement(get_cart_query);
-		ResultSet cart_query_result = cart_statement.executeQuery();
-		
-		while(cart_query_result.next()){
-			int product_id = cart_query_result.getInt("product_id");
-			int quantity = cart_query_result.getInt("quantity");
-			String get_wine_query = String.format("SELECT * FROM wine WHERE product_id = %d", product_id);
+		try {
+			PreparedStatement cart_statement = connection.prepareStatement(get_cart_query);
+			ResultSet cart_query_result = cart_statement.executeQuery();
 
-			PreparedStatement wine_statement = connection.prepareStatement(get_wine_query);
-			ResultSet wine_query_result = wine_statement.executeQuery();
-			if(wine_query_result.next()){
+			while (cart_query_result.next()) {
+				int product_id = cart_query_result.getInt("product_id");
+				int quantity = cart_query_result.getInt("quantity");
+				String get_wine_query = String.format("SELECT * FROM wine WHERE product_id = %d", product_id);
+
+				PreparedStatement wine_statement = connection.prepareStatement(get_wine_query);
+				ResultSet wine_query_result = wine_statement.executeQuery();
+				if (wine_query_result.next()) {
 
 					String wine_name = wine_query_result.getString("name");
 					String wine_producer = wine_query_result.getString("producer");
 					String wine_grapeWines = wine_query_result.getString("grapeWines");
-					String wine_notes = wine_query_result.getString("notes");							
+					String wine_notes = wine_query_result.getString("notes");
 					int wine_year = wine_query_result.getInt("year");
-					
-					Wine new_wine = new Wine(product_id,wine_name,wine_producer,wine_year,wine_notes,quantity,wine_grapeWines);
+
+					Wine new_wine = new Wine(product_id, wine_name, wine_producer, wine_year, wine_notes, quantity,
+							wine_grapeWines);
 					display_cart_list.add(new_wine);
-			}	
-		}	
-	} catch (SQLException e) {
-		e.printStackTrace();
-	}
-	return display_cart_list;
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return display_cart_list;
 	}
 
-public static Boolean removeFromCart(String email, int id) {
-	Connection connection = getConnection();
-	String query = String.format("DELETE FROM cart WHERE email = '%s' AND id = %d", email, id);
-	try {
-		PreparedStatement statement = connection.prepareStatement(query);
-		statement.executeUpdate();
-		return true;
+	public static Boolean removeFromCart(String email, int id) {
+		Connection connection = getConnection();
+		String query = String.format("DELETE FROM cart WHERE email = '%s' AND id = %d", email, id);
+		try {
+			PreparedStatement statement = connection.prepareStatement(query);
+			statement.executeUpdate();
+			return true;
 
-	} catch (SQLException e) {
-		e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
-	return false;
-	}	
 
-}	
+}
