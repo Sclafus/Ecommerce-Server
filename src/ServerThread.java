@@ -101,6 +101,10 @@ public class ServerThread extends Thread {
 								Integer.parseInt(msg[3]));
 						out.writeObject(add_to_cart_result);
 						break;
+					case "remove_from_cart":
+						Boolean remove_from_cart_result = removeFromCart(msg[1], Integer.parseInt(msg[2]));
+						out.writeObject(remove_from_cart_result);
+						break;
 					case "new_order":
 						Order buy_result = addOrder(msg[1]);
 						out.writeObject(buy_result);
@@ -656,8 +660,20 @@ public static ArrayList<Wine> displayCart(String email){
 		e.printStackTrace();
 	}
 	return display_cart_list;
-}
+	}
 
+public static Boolean removeFromCart(String email, int id) {
+	Connection connection = getConnection();
+	String query = String.format("DELETE FROM cart WHERE email = '%s' AND id = %d", email, id);
+	try {
+		PreparedStatement statement = connection.prepareStatement(query);
+		statement.executeUpdate();
+		return true;
 
+	} catch (SQLException e) {
+		e.printStackTrace();
+	}
+	return false;
+	}	
 
-}
+}	
