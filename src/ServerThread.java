@@ -507,9 +507,9 @@ public class ServerThread extends Thread {
 		return false;
 	}
 
-	public static ArrayList<String> getNotifications(String email){
+	public static ArrayList<Wine> getNotifications(String email){
 		Connection connection = getConnection();
-		ArrayList<String> notification_list = new ArrayList<String>();
+		ArrayList<Wine> notification_list = new ArrayList<Wine>();
 		String query = String.format("SELECT * FROM assignment3.notification WHERE email='%s'", email);
 		try {
 			PreparedStatement statement = connection.prepareStatement(query);
