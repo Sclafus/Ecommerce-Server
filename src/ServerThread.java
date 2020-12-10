@@ -109,6 +109,10 @@ public class ServerThread extends Thread {
 						ArrayList<Wine> notification_wines = getNotifications(msg[1]);
 						out.writeObject(notification_wines);
 						break;
+					case "display_cart":
+						ArrayList<Wine> display_result = displayCart(msg[1]);
+						out.writeObject(display_result);
+						break;
 					default:
 						break;
 				}
@@ -613,4 +617,43 @@ public class ServerThread extends Thread {
 		}
 		return nullOrder;
 	}
+
+public static ArrayList<Wine> displayCart(String email){
+	ArrayList<Wine> display_cart_list = new ArrayList<Wine>();
+
+	Connection connection = getConnection();
+	String get_cart_query = String.format("SELECT * FROM cart WHERE email = '%s'", email);
+
+	
+	try {
+		PreparedStatement cart_statement = connection.prepareStatement(get_cart_query);
+		ResultSet cart_query_result = cart_statement.executeQuery();
+		
+		while(cart_query_result.next()){
+			int product_id = cart_query_result.getInt("product_id");
+			int quantity = cart_query_result.getInt("quantity");
+			String get_wine_query = String.format("SELECT * FROM wine WHERE product_id = %d", product_id);
+
+			PreparedStatement wine_statement = connection.prepareStatement(get_wine_query);
+			ResultSet wine_query_result = wine_statement.executeQuery();
+			if(wine_query_result.next()){
+
+					String wine_name = wine_query_result.getString("name");
+					String wine_producer = wine_query_result.getString("producer");
+					String wine_grapeWines = wine_query_result.getString("grapeWines");
+					String wine_notes = wine_query_result.getString("notes");							
+					int wine_year = wine_query_result.getInt("year");
+					
+					Wine new_wine = new Wine(product_id,wine_name,wine_producer,wine_year,wine_notes,quantity,wine_grapeWines);
+					display_cart_list.add(new_wine);
+			}	
+		}	
+	} catch (SQLException e) {
+		e.printStackTrace();
+	}
+	return display_cart_list;
+}
+
+
+
 }
