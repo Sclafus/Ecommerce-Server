@@ -519,4 +519,75 @@ public class ServerThread extends Thread {
 		}
 		return notification_list;
 	}
+
+	public static Order addOrder(String email){
+
+		ArrayList<Wine> wines_order = new ArrayList<Wine>();
+		ArrayList<Integer> ids = new ArrayList<Integer>();
+		Order nullOrder = new Order();
+		Boolean shipped = false;
+		Connection connection = getConnection();
+
+		String get_id_query = String.format("SELECT order_id FROM order");
+		try{
+			PreparedStatement get_id_statement = connection.prepareStatement(get_id_query);
+			ResultSet get_id_result = get_id_statement.executeQuery();
+
+			while(get_id_result.next()){
+				int order_id = get_id_result.getInt("order_id");
+				ids.add(order_id);
+			}
+			int max_id = Collections.max(ids);
+			int order_id = max_id+1;
+			String select_query = String.format(
+									"SELECT * FROM cart WHERE email = '%s'", email);
+		
+			PreparedStatement select_statement = connection.prepareStatement(select_query);
+			ResultSet select_query_result = select_statement.executeQuery();
+
+			while (select_query_result.next()) {
+					int wine_product_id = select_query_result.getInt("product_id");
+					int wine_quantity = select_query_result.getInt("quantity");
+
+					String query_wine = String.format("SELECT * FROM wine WHERE product_id = %d", wine_product_id);
+					
+					PreparedStatement wine_statement = connection.prepareStatement(query_wine);
+					ResultSet wine_query_result = wine_statement.executeQuery();
+
+					if(wine_query_result.next()){
+						int stock_quantity = wine_query_result.getInt("quantity");
+				
+						//checks if the quantity the user wants of a certain wine is in stock
+						if(stock_quantity>wine_quantity){		
+							String wine_name = wine_query_result.getString("name");
+							String wine_producer = wine_query_result.getString("producer");
+							String wine_grapeWines = wine_query_result.getString("grapeWines");
+							String wine_notes = wine_query_result.getString("notes");							
+							int wine_year = wine_query_result.getInt("year");
+
+							Wine new_wine = new Wine(wine_product_id,wine_name,wine_producer,wine_year,wine_notes,wine_quantity,wine_grapeWines);
+							wines_order.add(new_wine);
+
+							int update_quantity = (-wine_quantity);
+							restock(wine_product_id, update_quantity);	
+
+							String query = String.format(
+											"INSERT INTO order(order_id, product_id, quantity, email, shipped) VALUES (%d, %d, %d, '%s', %b)",
+											order_id, wine_product_id, wine_quantity, email, false );
+		
+							PreparedStatement statement = connection.prepareStatement(query);
+							statement.executeUpdate();
+							} else {
+								//TODO handle notification
+							}
+					}
+			}
+
+			Order new_order = new Order(order_id, shipped, email, wines_order);
+			return new_order;	
+		} catch  (SQLException e) {
+				e.printStackTrace();
+		}
+		return nullOrder;
+	}
 }
