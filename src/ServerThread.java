@@ -518,16 +518,16 @@ public class ServerThread extends Thread {
 	public static ArrayList<Wine> getNotifications(String email) {
 		Connection connection = getConnection();
 		ArrayList<Wine> notification_list = new ArrayList<Wine>();
-		String query = String.format("SELECT product_id FROM assignment3.notification WHERE email='%s'", email);
+		String query_select_notification = String.format("SELECT product_id FROM assignment3.notification WHERE email='%s'", email);
 
 		try {
-			PreparedStatement select_notification_statement = connection.prepareStatement(query);
+			PreparedStatement select_notification_statement = connection.prepareStatement(query_select_notification);
 			ResultSet result_select_notification = select_notification_statement.executeQuery();
 
 			while (result_select_notification.next()) {
 				int product_id = result_select_notification.getInt("product_id");
-				String query_wine = String.format("SELECT * FROM assignment3.wine WHERE product_id=%d", product_id);
-				PreparedStatement select_wine_statement = connection.prepareStatement(query_wine);
+				String query_select_wine = String.format("SELECT * FROM assignment3.wine WHERE product_id=%d", product_id);
+				PreparedStatement select_wine_statement = connection.prepareStatement(query_select_wine);
 				ResultSet result_select_wine = select_wine_statement.executeQuery();
 
 				if (result_select_wine.next()) {
@@ -541,6 +541,9 @@ public class ServerThread extends Thread {
 					notification_list.add(wine);
 				}
 			}
+			String delete_notification_query = String.format("DELETE FROM assignment3.notification WHERE email='%s'", email);
+			PreparedStatement delete_query_statement = connection.prepareStatement(delete_notification_query);
+			delete_query_statement.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
