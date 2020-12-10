@@ -610,7 +610,7 @@ public class ServerThread extends Thread {
 					int stock_quantity = wine_query_result.getInt("quantity");
 
 					// checks if the quantity the user wants of a certain wine is in stock
-					if (stock_quantity > wine_quantity) {
+					if (stock_quantity > wine_quantity && stock_quantity > 0) {
 						String wine_name = wine_query_result.getString("name");
 						String wine_producer = wine_query_result.getString("producer");
 						String wine_grapeWines = wine_query_result.getString("grapeWines");
@@ -630,6 +630,10 @@ public class ServerThread extends Thread {
 
 						PreparedStatement statement = connection.prepareStatement(query);
 						statement.executeUpdate();
+
+						String delete_cart_query = String.format("DELETE FROM cart WHERE email='%s'", email);
+						PreparedStatement delete_cart_statement = connection.prepareStatement(delete_cart_query);
+						delete_cart_statement.executeUpdate();
 					} else {
 						// TODO handle notification
 					}
@@ -696,8 +700,9 @@ public class ServerThread extends Thread {
 
 	public static Boolean shipOrder(int order_id) {
 		Connection connection = getConnection();
-		String query_select_order = String.format("UPDATE assignment3.order SET shipped=true WHERE order_id=%d", order_id);
-		
+		String query_select_order = String.format("UPDATE assignment3.order SET shipped=true WHERE order_id=%d",
+				order_id);
+
 		try {
 			PreparedStatement statement_select_order = connection.prepareStatement(query_select_order);
 			statement_select_order.executeUpdate();
