@@ -533,6 +533,7 @@ public class ServerThread extends Thread {
 		return false;
 	}
 
+	//TODO javadoc
 	public static ArrayList<Wine> getNotifications(String email) {
 		Connection connection = getConnection();
 		ArrayList<Wine> notification_list = new ArrayList<Wine>();
@@ -571,6 +572,24 @@ public class ServerThread extends Thread {
 		return notification_list;
 	}
 
+	//TODO javadoc
+	public static Boolean addNotification(String email, int product_id) {
+		Connection connection = getConnection();
+		String insert_notification_query = String
+				.format("INSERT INTO notification(email, product_id) VALUES ('%s', %d)", email, product_id);
+		
+		try {
+			PreparedStatement insert_notification_statement = connection.prepareStatement(insert_notification_query);
+			insert_notification_statement.executeUpdate();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
+	//TODO javadoc & comments
 	public static Order addOrder(String email) {
 
 		ArrayList<Wine> wines_order = new ArrayList<Wine>();
@@ -621,7 +640,7 @@ public class ServerThread extends Thread {
 						wines_order.add(new_wine);
 
 						restock(wine_product_id, -wine_quantity);
-						
+
 						String query = String.format(
 								"INSERT INTO assignment3.order(order_id, product_id, quantity, email, shipped) VALUES (%d, %d, %d, '%s', %b)",
 								order_id, wine_product_id, wine_quantity, email, false);
@@ -639,8 +658,8 @@ public class ServerThread extends Thread {
 			}
 
 			Order new_order = new Order(order_id, shipped, email, wines_order);
-	
-			String delete_cart_query = String.format("DELETE FROM cart WHERE email='%s'",email);
+
+			String delete_cart_query = String.format("DELETE FROM cart WHERE email='%s'", email);
 			PreparedStatement delete_query_statement = connection.prepareStatement(delete_cart_query);
 			delete_query_statement.executeUpdate();
 
@@ -652,6 +671,7 @@ public class ServerThread extends Thread {
 		return nullOrder;
 	}
 
+	//TODO javadoc
 	public static ArrayList<Wine> displayCart(String email) {
 		ArrayList<Wine> display_cart_list = new ArrayList<Wine>();
 
@@ -688,6 +708,7 @@ public class ServerThread extends Thread {
 		return display_cart_list;
 	}
 
+	//TODO javadoc
 	public static Boolean removeFromCart(String email, int id) {
 		Connection connection = getConnection();
 		String query = String.format("DELETE FROM cart WHERE email='%s' AND product_id=%d", email, id);
@@ -702,6 +723,7 @@ public class ServerThread extends Thread {
 		return false;
 	}
 
+	//TODO javadoc
 	public static Boolean shipOrder(int order_id) {
 		Connection connection = getConnection();
 		String query_select_order = String.format("UPDATE assignment3.order SET shipped=true WHERE order_id=%d",
