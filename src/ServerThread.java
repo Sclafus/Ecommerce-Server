@@ -96,8 +96,9 @@ public class ServerThread extends Thread {
 						out.writeObject(wines);
 						break;
 
-						case "add_to_cart":
-						Boolean add_to_cart_result = addToCart(msg[1], Integer.parseInt(msg[2]), Integer.parseInt(msg[3]));
+					case "add_to_cart":
+						Boolean add_to_cart_result = addToCart(msg[1], Integer.parseInt(msg[2]),
+								Integer.parseInt(msg[3]));
 						out.writeObject(add_to_cart_result);
 						break;
 
@@ -305,7 +306,7 @@ public class ServerThread extends Thread {
 
 	// TODO fix javadoc
 	/**
-	 * Returns the list of the orders.  that have been placed.
+	 * Returns the list of the orders. that have been placed.
 	 * 
 	 * @return ArrayList with all the Orders. [ArrayList<Order>]
 	 * @see Order
@@ -341,14 +342,14 @@ public class ServerThread extends Thread {
 				ResultSet query_result = statement.executeQuery();
 				ArrayList<Wine> products = new ArrayList<Wine>();
 
-				String email ="";
+				String email = "";
 				Boolean shipped = false;
 				while (query_result.next()) {
 					email = query_result.getString("email");
 					shipped = query_result.getBoolean("shipped");
 					int product_id = query_result.getInt("product_id");
 					int quantity = query_result.getInt("quantity");
-					
+
 					String query_wine = String.format("SELECT * FROM assignment3.wine WHERE product_id=%d", product_id);
 					PreparedStatement statement_wine = connection.prepareStatement(query_wine);
 					ResultSet query_result_wine = statement_wine.executeQuery();
@@ -479,27 +480,40 @@ public class ServerThread extends Thread {
 	 * specified by the employee. It returns the {@code true} if the operation is
 	 * successful, otherwise it returns the {@code false}.
 	 * 
-	 * @param email        of the {@code User} adding to the cart. [String]
-	 * @param id           of the {@code Wine}. [int]
-	 * @param quantity     the quantity that the {@code User} wants to buy. [int]
-	 * @return {@code true} if the wine has been added to the cart, {@code false} if the
-	 *         wine has not been added to the cart for whatever reason. [Boolean]
+	 * @param email    of the {@code User} adding to the cart. [String]
+	 * @param id       of the {@code Wine}. [int]
+	 * @param quantity the quantity that the {@code User} wants to buy. [int]
+	 * @return {@code true} if the wine has been added to the cart, {@code false} if
+	 *         the wine has not been added to the cart for whatever reason.
+	 *         [Boolean]
 	 * @see User
 	 * @see Wine
 	 */
-	public static Boolean addToCart(String email, int id, int quantity){
+	public static Boolean addToCart(String email, int id, int quantity) {
 		Connection connection = getConnection();
-		String query = String.format(
-						"INSERT INTO cart(email, product_id, quantity) VALUES ('%s', %d, %d)",
-						email, id, quantity);
-		try{
+		String query = String.format("INSERT INTO cart(email, product_id, quantity) VALUES ('%s', %d, %d)", email, id,
+				quantity);
+		try {
 			PreparedStatement statement = connection.prepareStatement(query);
 			statement.executeUpdate();
 			return true;
 
 		} catch (SQLException e) {
-				e.printStackTrace();
-			}
-			return false;
-		}				
+			e.printStackTrace();
+		}
+		return false;
 	}
+
+	public static ArrayList<String> getNotifications(String email){
+		Connection connection = getConnection();
+		ArrayList<String> notification_list = new ArrayList<String>();
+		String query = String.format("SELECT * FROM assignment3.notification WHERE email='%s'", email);
+		try {
+			PreparedStatement statement = connection.prepareStatement(query);
+			ResultSet result_select = statement.executeQuery();
+
+		} catch (Exception e) {
+		}
+		return notification_list;
+	}
+}
