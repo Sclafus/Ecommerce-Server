@@ -101,7 +101,10 @@ public class ServerThread extends Thread {
 								Integer.parseInt(msg[3]));
 						out.writeObject(add_to_cart_result);
 						break;
-
+					case "add_order":
+						Order buy_result = addOrder(msg[1]);
+						out.writeObject(buy_result);
+						break;
 					default:
 						break;
 				}
