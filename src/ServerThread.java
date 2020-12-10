@@ -82,7 +82,7 @@ public class ServerThread extends Thread {
 						break;
 
 					case "get_orders":
-						ArrayList<Order> orders = getOrders();
+						ArrayList<Order> orders = getOrders(msg[1]);
 						out.writeObject(orders);
 						break;
 
