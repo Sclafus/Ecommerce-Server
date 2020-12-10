@@ -635,7 +635,7 @@ public class ServerThread extends Thread {
 					int stock_quantity = wine_query_result.getInt("quantity");
 
 					// checks if the quantity the user wants of a certain wine is in stock
-					if (stock_quantity > wine_quantity && stock_quantity > 0) {
+					if (stock_quantity >= wine_quantity && stock_quantity > 0) {
 						String wine_name = wine_query_result.getString("name");
 						String wine_producer = wine_query_result.getString("producer");
 						String wine_grapeWines = wine_query_result.getString("grapeWines");
