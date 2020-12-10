@@ -321,7 +321,7 @@ public class ServerThread extends Thread {
 
 	// TODO fix javadoc
 	/**
-	 * Returns the list of the orders. that have been placed.
+	 * Returns the list of the orders that have been placed.
 	 * 
 	 * @return ArrayList with all the Orders. [ArrayList<Order>]
 	 * @see Order
@@ -566,7 +566,7 @@ public class ServerThread extends Thread {
 		Boolean shipped = false;
 		Connection connection = getConnection();
 
-		String get_id_query = String.format("SELECT order_id FROM order");
+		String get_id_query = String.format("SELECT order_id FROM assignment3.order");
 		try {
 			PreparedStatement get_id_statement = connection.prepareStatement(get_id_query);
 			ResultSet get_id_result = get_id_statement.executeQuery();
@@ -576,6 +576,7 @@ public class ServerThread extends Thread {
 				ids.add(order_id);
 			}
 			int max_id = Collections.max(ids);
+			System.out.println(max_id);
 			int order_id = max_id + 1;
 			String select_query = String.format("SELECT * FROM cart WHERE email = '%s'", email);
 
@@ -610,7 +611,7 @@ public class ServerThread extends Thread {
 						restock(wine_product_id, update_quantity);
 
 						String query = String.format(
-								"INSERT INTO order(order_id, product_id, quantity, email, shipped) VALUES (%d, %d, %d, '%s', %b)",
+								"INSERT INTO assignment3.order(order_id, product_id, quantity, email, shipped) VALUES (%d, %d, %d, '%s', %b)",
 								order_id, wine_product_id, wine_quantity, email, false);
 
 						PreparedStatement statement = connection.prepareStatement(query);
