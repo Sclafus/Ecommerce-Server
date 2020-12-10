@@ -515,6 +515,7 @@ public class ServerThread extends Thread {
 		return false;
 	}
 
+	//TODO fix, it doesn't work 😢
 	public static ArrayList<Wine> getNotifications(String email) {
 		Connection connection = getConnection();
 		ArrayList<Wine> notification_list = new ArrayList<Wine>();
