@@ -696,7 +696,7 @@ public class ServerThread extends Thread {
 
 	public static Boolean shipOrder(int order_id) {
 		Connection connection = getConnection();
-		String query_select_order = String.format("UPDATE assignment3.order SET WHERE order_id=%d", order_id);
+		String query_select_order = String.format("UPDATE assignment3.order SET shipped=true WHERE order_id=%d", order_id);
 		
 		try {
 			PreparedStatement statement_select_order = connection.prepareStatement(query_select_order);
