@@ -533,7 +533,6 @@ public class ServerThread extends Thread {
 		return false;
 	}
 
-	// TODO fix, it doesn't work 😢
 	public static ArrayList<Wine> getNotifications(String email) {
 		Connection connection = getConnection();
 		ArrayList<Wine> notification_list = new ArrayList<Wine>();
@@ -570,31 +569,6 @@ public class ServerThread extends Thread {
 			e.printStackTrace();
 		}
 		return notification_list;
-	}
-
-	public static Boolean decreaseQuantity(int id, int quantity_to_subtract) {
-		Connection connection = getConnection();
-		String query = String.format("SELECT quantity FROM wine WHERE product_id = %d", id);
-
-		try {
-			PreparedStatement statement = connection.prepareStatement(query);
-			ResultSet query_result = statement.executeQuery();
-
-			while (query_result.next()) {
-				int old_quantity = query_result.getInt("quantity");
-
-				String query_restock = String.format("UPDATE wine SET quantity = %d WHERE product_id = %d",
-						old_quantity-quantity_to_subtract, id);
-
-				PreparedStatement statement_restock = connection.prepareStatement(query_restock);
-				statement_restock.executeUpdate();
-				System.out.format("Wine %d has been restocked\n", id);
-				return true;
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return false;
 	}
 
 	public static Order addOrder(String email) {
@@ -646,7 +620,7 @@ public class ServerThread extends Thread {
 								wine_quantity, wine_grapeWines);
 						wines_order.add(new_wine);
 
-						decreaseQuantity(wine_product_id, wine_quantity);
+						restock(wine_product_id, -wine_quantity);
 						
 						String query = String.format(
 								"INSERT INTO assignment3.order(order_id, product_id, quantity, email, shipped) VALUES (%d, %d, %d, '%s', %b)",
