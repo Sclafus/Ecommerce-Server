@@ -86,9 +86,14 @@ public class ServerThread extends Thread {
 						out.writeObject(orders);
 						break;
 
-					case "get_orders_user":
-						ArrayList<Order> orders2 = getOrders(msg[1]);
+					case "get_orders_employee":
+						ArrayList<Order> orders2 = getOrders(msg[1], "2");
 						out.writeObject(orders2);
+						break;
+
+					case "get_orders_user":
+						ArrayList<Order> orders3 = getOrders(msg[1], "1");
+						out.writeObject(orders3);
 						break;
 
 					case "get_wines":
@@ -101,22 +106,27 @@ public class ServerThread extends Thread {
 								Integer.parseInt(msg[3]));
 						out.writeObject(add_to_cart_result);
 						break;
+
 					case "remove_from_cart":
 						Boolean remove_from_cart_result = removeFromCart(msg[1], Integer.parseInt(msg[2]));
 						out.writeObject(remove_from_cart_result);
 						break;
+
 					case "new_order":
 						Order buy_result = addOrder(msg[1]);
 						out.writeObject(buy_result);
 						break;
+
 					case "get_notifications":
 						ArrayList<Wine> notification_wines = getNotifications(msg[1]);
 						out.writeObject(notification_wines);
 						break;
+
 					case "display_cart":
 						ArrayList<Wine> display_result = displayCart(msg[1]);
 						out.writeObject(display_result);
 						break;
+
 					default:
 						break;
 				}
@@ -333,8 +343,12 @@ public class ServerThread extends Thread {
 		String query_id = "";
 		if (user.length == 0) {
 			query_id = "SELECT order_id FROM assignment3.order";
-		} else {
+		} 
+
+		if(user.length == 2 && user[1] == "1") {
 			query_id = String.format("SELECT order_id FROM assignment3.order WHERE email='%s'", user[0]);
+		} else {
+			query_id = String.format("SELECT order_id FROM assignment3.order WHERE shipped=false", user[0]);
 		}
 
 		try {
