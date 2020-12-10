@@ -105,6 +105,10 @@ public class ServerThread extends Thread {
 						Order buy_result = addOrder(msg[1]);
 						out.writeObject(buy_result);
 						break;
+					case "get_notifications":
+						ArrayList<Wine> notification_wines = getNotifications(msg[1]);
+						out.writeObject(notification_wines);
+						break;
 					default:
 						break;
 				}
@@ -510,12 +514,31 @@ public class ServerThread extends Thread {
 	public static ArrayList<Wine> getNotifications(String email){
 		Connection connection = getConnection();
 		ArrayList<Wine> notification_list = new ArrayList<Wine>();
-		String query = String.format("SELECT * FROM assignment3.notification WHERE email='%s'", email);
-		try {
-			PreparedStatement statement = connection.prepareStatement(query);
-			ResultSet result_select = statement.executeQuery();
+		String query = String.format("SELECT product_id FROM assignment3.notification WHERE email='%s'", email);
 
+		try {
+			PreparedStatement select_notification_statement = connection.prepareStatement(query);
+			ResultSet result_select_notification = select_notification_statement.executeQuery();
+
+			while(result_select_notification.next()){
+				int product_id = result_select_notification.getInt("product_id");
+				String query_wine = String.format("SELECT * FROM assignment3.wine WHERE product_id=%d", product_id);
+				PreparedStatement select_wine_statement = connection.prepareStatement(query_wine);
+				ResultSet result_select_wine = select_wine_statement.executeQuery();
+
+				if(result_select_wine.next()){
+					String name = result_select_wine.getString("name"); 
+					int year = result_select_wine.getInt("year"); 
+					String producer = result_select_wine.getString("producer");
+					String grapeWines = result_select_wine.getString("grapeWines");
+					int quantity = result_select_wine.getInt("quantity");
+					String notes = result_select_wine.getString("notes"); 
+					Wine wine = new Wine(product_id, name, producer, year, notes, quantity, grapeWines);
+					notification_list.add(wine);
+				}
+			}
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return notification_list;
 	}
