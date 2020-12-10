@@ -667,7 +667,7 @@ public class ServerThread extends Thread {
 
 	public static Boolean removeFromCart(String email, int id) {
 		Connection connection = getConnection();
-		String query = String.format("DELETE FROM cart WHERE email = '%s' AND id = %d", email, id);
+		String query = String.format("DELETE FROM cart WHERE email='%s' AND product_id=%d", email, id);
 		try {
 			PreparedStatement statement = connection.prepareStatement(query);
 			statement.executeUpdate();
