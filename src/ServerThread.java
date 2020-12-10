@@ -343,9 +343,9 @@ public class ServerThread extends Thread {
 		String query_id = "";
 		if (user.length == 0) {
 			query_id = "SELECT order_id FROM assignment3.order";
-		} 
+		}
 
-		if(user.length == 2 && user[1] == "1") {
+		if (user.length == 2 && user[1] == "1") {
 			query_id = String.format("SELECT order_id FROM assignment3.order WHERE email='%s'", user[0]);
 		} else {
 			query_id = String.format("SELECT order_id FROM assignment3.order WHERE shipped=false", user[0]);
@@ -694,4 +694,18 @@ public class ServerThread extends Thread {
 		return false;
 	}
 
+	public static Boolean shipOrder(int order_id) {
+		Connection connection = getConnection();
+		String query_select_order = String.format("UPDATE assignment3.order SET WHERE order_id=%d", order_id);
+		
+		try {
+			PreparedStatement statement_select_order = connection.prepareStatement(query_select_order);
+			statement_select_order.executeUpdate();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+
+	}
 }
