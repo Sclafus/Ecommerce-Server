@@ -432,6 +432,10 @@ public class ServerThread extends Thread {
 
 				PreparedStatement statement_restock = connection.prepareStatement(query_restock);
 				statement_restock.executeUpdate();
+				//notifications
+				String notifications_query = String.format("UPDATE notification SET send=true WHERE product_id=%d", id);
+				PreparedStatement notification_statement = connection.prepareStatement(notifications_query);
+				notification_statement.executeUpdate();
 				System.out.format("Wine %d has been restocked\n", id);
 				return true;
 			}
@@ -538,7 +542,7 @@ public class ServerThread extends Thread {
 		Connection connection = getConnection();
 		ArrayList<Wine> notification_list = new ArrayList<Wine>();
 		String query_select_notification = String
-				.format("SELECT product_id FROM assignment3.notification WHERE email='%s'", email);
+				.format("SELECT product_id, send FROM assignment3.notification WHERE email='%s'", email);
 
 		try {
 			PreparedStatement select_notification_statement = connection.prepareStatement(query_select_notification);
@@ -546,23 +550,25 @@ public class ServerThread extends Thread {
 
 			while (result_select_notification.next()) {
 				int product_id = result_select_notification.getInt("product_id");
-				String query_select_wine = String.format("SELECT * FROM assignment3.wine WHERE product_id=%d",
-						product_id);
-				PreparedStatement select_wine_statement = connection.prepareStatement(query_select_wine);
-				ResultSet result_select_wine = select_wine_statement.executeQuery();
-
-				if (result_select_wine.next()) {
-					String name = result_select_wine.getString("name");
-					int year = result_select_wine.getInt("year");
-					String producer = result_select_wine.getString("producer");
-					String grapeWines = result_select_wine.getString("grapeWines");
-					int quantity = result_select_wine.getInt("quantity");
-					String notes = result_select_wine.getString("notes");
-					Wine wine = new Wine(product_id, name, producer, year, notes, quantity, grapeWines);
-					notification_list.add(wine);
+				if(result_select_notification.getBoolean("send")){
+					String query_select_wine = String.format("SELECT * FROM assignment3.wine WHERE product_id=%d",
+							product_id);
+					PreparedStatement select_wine_statement = connection.prepareStatement(query_select_wine);
+					ResultSet result_select_wine = select_wine_statement.executeQuery();
+	
+					if (result_select_wine.next()) {
+						String name = result_select_wine.getString("name");
+						int year = result_select_wine.getInt("year");
+						String producer = result_select_wine.getString("producer");
+						String grapeWines = result_select_wine.getString("grapeWines");
+						int quantity = result_select_wine.getInt("quantity");
+						String notes = result_select_wine.getString("notes");
+						Wine wine = new Wine(product_id, name, producer, year, notes, quantity, grapeWines);
+						notification_list.add(wine);
+					}
 				}
 			}
-			String delete_notification_query = String.format("DELETE FROM assignment3.notification WHERE email='%s'",
+			String delete_notification_query = String.format("DELETE FROM assignment3.notification WHERE email='%s' AND send=true",
 					email);
 			PreparedStatement delete_query_statement = connection.prepareStatement(delete_notification_query);
 			delete_query_statement.executeUpdate();
@@ -626,7 +632,7 @@ public class ServerThread extends Thread {
 
 				if (wine_query_result.next()) {
 					int stock_quantity = wine_query_result.getInt("quantity");
-
+					
 					// checks if the quantity the user wants of a certain wine is in stock
 					if (stock_quantity >= wine_quantity && stock_quantity > 0) {
 						String wine_name = wine_query_result.getString("name");
@@ -652,7 +658,7 @@ public class ServerThread extends Thread {
 						PreparedStatement delete_cart_statement = connection.prepareStatement(delete_cart_query);
 						delete_cart_statement.executeUpdate();
 					} else {
-						// TODO handle notification
+						addNotification(email, wine_product_id);
 					}
 				}
 			}
