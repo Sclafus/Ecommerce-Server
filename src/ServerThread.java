@@ -51,7 +51,10 @@ public class ServerThread extends Thread {
 						User login_result = login(msg[1], msg[2]);
 						out.writeObject(login_result);
 						break;
-
+					case "guest":
+						User guest_result = guest();
+						out.writeObject(guest_result);
+						break;
 					case "register_user":
 						User register_user_result = register(msg[1], msg[2], msg[3], msg[4], 1);
 						out.writeObject(register_user_result);
@@ -173,6 +176,11 @@ public class ServerThread extends Thread {
 		return null;
 	}
 
+	public static User guest(){
+
+		User null_user = new User();
+		return null_user;
+	}
 	/**
 	 * Checks if the user with the selected email and password is present in the
 	 * database.
