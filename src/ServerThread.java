@@ -767,7 +767,7 @@ public class ServerThread extends Thread {
 					}
 				}
 			}
-
+			//checks if the order was placed or not
 			String post_order_query = String.format("SELECT order_id FROM assignment3.order");
 			PreparedStatement post_order_statement = connection.prepareStatement(post_order_query);
 			ResultSet post_order_result = post_order_statement.executeQuery();
@@ -777,11 +777,13 @@ public class ServerThread extends Thread {
 				id_post_order.add(order_ids);
 			}
 			max_id_post = Collections.max(id_post_order);
+			//the order was added to the order table
 			if(max_id_post == order_id){
 				Order new_order = new Order(order_id, shipped, email, wines_order);
 				// returns the object of the new order once the order is completed
 				return new_order;
 			} else {
+				//returns null_order if the wine is not in stock or there's not enough wine
 				return null_order;
 			}
 			
