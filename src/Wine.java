@@ -10,7 +10,7 @@ public class Wine implements Serializable {
 
 	private static final long serialVersionUID = 1727284212719259730L;
 	private String name;
-	private int product_id;
+	private int productId;
 	private String producer;
 	private int year;
 	private String notes;
@@ -23,7 +23,7 @@ public class Wine implements Serializable {
 	public Wine() {
 		this.name = "";
 		this.producer = "";
-		this.product_id = -1;
+		this.productId = -1;
 		this.year = -1;
 		this.notes = "";
 		this.grapes = "";
@@ -48,7 +48,7 @@ public class Wine implements Serializable {
 		this.producer = producer;
 		this.year = year;
 		this.notes = notes;
-		this.product_id = id;
+		this.productId = id;
 		this.quantity = quantity;
 		this.grapes = grapes;
 	}
@@ -113,7 +113,7 @@ public class Wine implements Serializable {
 	 * @return the product id of the {@code Wine}. [int]
 	 */
 	public int getProductId() {
-		return this.product_id;
+		return this.productId;
 	}
 
 	/**
