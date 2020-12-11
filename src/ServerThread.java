@@ -154,7 +154,7 @@ public class ServerThread extends Thread {
 	public static Connection getConnection() {
 		try {
 			// username and password are in clear and have all the permissions.
-			// this is ok since we are not in production 🤷‍♂️
+			// this is ok since we are not in production
 			String driver = "com.mysql.cj.jdbc.Driver";
 			String url = "jdbc:mysql://localhost:3306/assignment3?useLegacyDatetimeCode=false&serverTimezone=UTC";
 			String username = "root";
@@ -271,7 +271,7 @@ public class ServerThread extends Thread {
 	 * 
 	 * @param name       the name of the {@code User}. [String]
 	 * @param surname    the surname of the {@code User}. [String]
-	 * @param email      the email of the {@code User}. [String]
+	 * @param mail       the email of the {@code User}. [String]
 	 * @param password   the password of the {@code User}. [String]
 	 * @param permission the permission of the {@code User}. [String]
 	 * @return {@code User} object. {@code null_user} if the account is already
@@ -315,7 +315,7 @@ public class ServerThread extends Thread {
 	 * Gets all the users with the selected permission.
 	 * 
 	 * @param permission the selected permission. [int]
-	 * @return ArrayList with all the Users. [ArrayList<User>]
+	 * @return ArrayList with all the Users. [ArrayList of User]
 	 * @see User
 	 */
 	public static ArrayList<User> getUsers(int permission) {
@@ -350,8 +350,11 @@ public class ServerThread extends Thread {
 	 * <li>two parameters: if the second parameter is 1, it will return all the
 	 * {@code Order}s made by the specified user in the first parameter. Else, it
 	 * will return all the unshipped {@code Order}s.</li>
+	 * </ul>
 	 * 
-	 * @return ArrayList with all the Orders. [ArrayList<Order>]
+	 * @param user [optional] Argument 1: email of the user. [String] Argument 2:
+	 *             permission. [String]
+	 * @return ArrayList with all the Orders. [ArrayList of Order]
 	 * @see User
 	 * @see Order
 	 */
@@ -396,7 +399,7 @@ public class ServerThread extends Thread {
 			Collections.sort(order_ids);
 
 			for (int order_id : order_ids) {
-				//select a determined order and all of his entries in the DBMS
+				// select a determined order and all of his entries in the DBMS
 				String query = String.format("SELECT * FROM assignment3.order WHERE order_id=%d", order_id);
 				PreparedStatement statement = connection.prepareStatement(query);
 				ResultSet query_result = statement.executeQuery();
@@ -405,29 +408,29 @@ public class ServerThread extends Thread {
 				String email = "";
 				Boolean shipped = false;
 				while (query_result.next()) {
-					//gets the wine of the selected entry
+					// gets the wine of the selected entry
 					email = query_result.getString("email");
 					shipped = query_result.getBoolean("shipped");
 					int product_id = query_result.getInt("product_id");
 					int quantity = query_result.getInt("quantity");
-					//gets the wine from the DBMS
+					// gets the wine from the DBMS
 					String query_wine = String.format("SELECT * FROM assignment3.wine WHERE product_id=%d", product_id);
 					PreparedStatement statement_wine = connection.prepareStatement(query_wine);
 					ResultSet query_result_wine = statement_wine.executeQuery();
 
 					while (query_result_wine.next()) {
-						//instantiate the wine object
+						// instantiate the wine object
 						String name = query_result_wine.getString("name");
 						String producer = query_result_wine.getString("producer");
 						int year = query_result_wine.getInt("year");
 						String notes = query_result_wine.getString("notes");
 						String grapes = query_result_wine.getString("grapeWines");
 						Wine tmp = new Wine(product_id, name, producer, year, notes, quantity, grapes);
-						//adds the wine to the arraylist of wines for the present order
-						products.add(tmp); 
+						// adds the wine to the arraylist of wines for the present order
+						products.add(tmp);
 					}
 				}
-				//instantiate the order object
+				// instantiate the order object
 				Order new_order = new Order(order_id, shipped, email, products);
 				orders_list.add(new_order);
 
@@ -489,7 +492,7 @@ public class ServerThread extends Thread {
 	 * 
 	 * @param name        of the wine to search. [String]
 	 * @param year_string of the wine to search. [String]
-	 * @return ArrayList with all the Wines found. [ArrayList<Wine>]
+	 * @return ArrayList with all the Wines found. [ArrayList of Wine]
 	 * @see Wine
 	 */
 	public static ArrayList<Wine> search(String name, String year_string) {
@@ -581,12 +584,12 @@ public class ServerThread extends Thread {
 	/**
 	 * Gets all the notifications from the notifications' table where the email's
 	 * field in the table corrisponds with the given {@code User}'s email. It
-	 * returns a ArrayList<Wine> containing all the wines the {@code User} need to
+	 * returns a ArrayList of Wine containing all the wines the {@code User} need to
 	 * be notificated for.
 	 * 
 	 * @param email of the {@code User}. [String]
 	 * @return the ArrayList with the {@code Wine} the {@code User} needs to be
-	 *         notificated for. [ArrayList<Wine>]
+	 *         notificated for. [ArrayList of Wine]
 	 * @see User
 	 * @see Wine
 	 */
@@ -748,12 +751,6 @@ public class ServerThread extends Thread {
 			}
 			// creates the object of the new order
 			Order new_order = new Order(order_id, shipped, email, wines_order);
-
-			// String delete_cart_query = String.format("DELETE FROM cart WHERE email='%s'",
-			// email);
-			// PreparedStatement delete_query_statement =
-			// connection.prepareStatement(delete_cart_query);
-			// delete_query_statement.executeUpdate();
 			// returns the object of the new order once the order is completed
 			return new_order;
 
@@ -771,7 +768,7 @@ public class ServerThread extends Thread {
 	 * 
 	 * @param email of the {@code User}. [String]
 	 * @return the ArrayList with all the {@code Wine} present in the user's cart.
-	 *         [ArrayList<Wine>]
+	 *         [ArrayList of Wine]
 	 * @see Wine
 	 * @see User
 	 */
