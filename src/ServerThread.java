@@ -30,13 +30,13 @@ public class ServerThread extends Thread {
 	public void run() {
 
 		try {
-			InputStream inputStream = this.socket.getInputStream(); //TODO fix this 
+			InputStream inputStream = this.socket.getInputStream(); // TODO fix this
 			ObjectInputStream in = new ObjectInputStream(inputStream);
 
 			try {
 				// input from the client
 				String[] msg = (String[]) in.readObject();
-				OutputStream outputStream = this.socket.getOutputStream(); //TODO fix this
+				OutputStream outputStream = this.socket.getOutputStream(); // TODO fix this
 				ObjectOutputStream out = new ObjectOutputStream(outputStream);
 
 				// stuff happens here!
@@ -182,7 +182,7 @@ public class ServerThread extends Thread {
 
 		Connection connection = getConnection();
 		String query = String.format("SELECT * FROM user WHERE email='%s'", email);
-		User nullUser = new User(); //TODO fix this
+		User nullUser = new User(); // TODO fix this
 
 		try {
 			PreparedStatement statement = connection.prepareStatement(query);
@@ -203,7 +203,7 @@ public class ServerThread extends Thread {
 			e.printStackTrace();
 		}
 		// returns nullUser if the password is wrong or account doesn't exists.
-		return nullUser; //TODO fix this
+		return nullUser; // TODO fix this
 	}
 
 	/**
@@ -223,7 +223,7 @@ public class ServerThread extends Thread {
 	 * @see Wine
 	 */
 	public static Wine addWine(String name, int year, String producer, String grapes, String notes) {
-		Wine nullWine = new Wine(); //TODO fix this
+		Wine nullWine = new Wine(); // TODO fix this
 
 		Connection connection = getConnection();
 		String select_query = String.format(
@@ -258,7 +258,7 @@ public class ServerThread extends Thread {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return nullWine; //TODO Fix this
+		return nullWine; // TODO Fix this
 	}
 
 	/**
@@ -278,7 +278,7 @@ public class ServerThread extends Thread {
 
 		Connection connection = getConnection();
 		String query = String.format("SELECT email FROM user WHERE email='%s'", mail);
-		User nullUser = new User(); //TODO Fix this
+		User nullUser = new User(); // TODO Fix this
 
 		try {
 			PreparedStatement statement = connection.prepareStatement(query);
@@ -290,18 +290,18 @@ public class ServerThread extends Thread {
 			} else {
 				String query1 = String.format(
 						"INSERT INTO user(name, surname, email, password, permission) VALUES ('%s', '%s', '%s', '%s', %d)",
-						name, surname, mail, password, permission); //TODO Fix this
+						name, surname, mail, password, permission); // TODO Fix this
 
-				PreparedStatement statement1 = connection.prepareStatement(query1); //TODO Fix this
-				statement1.executeUpdate(); //TODO Fix this
-				User newUser = new User(name, surname, mail, password, permission); //TODO Fix this
+				PreparedStatement statement1 = connection.prepareStatement(query1); // TODO Fix this
+				statement1.executeUpdate(); // TODO Fix this
+				User newUser = new User(name, surname, mail, password, permission); // TODO Fix this
 				System.out.format("User %s has been added\n", mail);
-				return newUser; //TODO Fix this
+				return newUser; // TODO Fix this
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return nullUser; //TODO Fix this
+		return nullUser; // TODO Fix this
 	}
 
 	/**
@@ -487,7 +487,7 @@ public class ServerThread extends Thread {
 				// case 3: name null, year not null
 				query = String.format("SELECT * FROM wine WHERE year=%d", year);
 			} else if (year != 0) {
-				// case 4: nothing is null 
+				// case 4: nothing is null
 				query = String.format("SELECT * FROM wine WHERE year=%d AND name='%s'", year, name);
 			}
 		}
@@ -549,7 +549,7 @@ public class ServerThread extends Thread {
 		Connection connection = getConnection();
 		ArrayList<Wine> notification_list = new ArrayList<Wine>();
 		String query_select_notification = String
-				.format("SELECT product_id, send FROM assignment3.notification WHERE email='%s'", email);
+				.format("SELECT product_id, send FROM assignment3.notification WHERE email='%s' AND send=true", email);
 
 		try {
 			PreparedStatement select_notification_statement = connection.prepareStatement(query_select_notification);
@@ -557,22 +557,20 @@ public class ServerThread extends Thread {
 
 			while (result_select_notification.next()) {
 				int product_id = result_select_notification.getInt("product_id");
-				if (result_select_notification.getBoolean("send")) {
-					String query_select_wine = String.format("SELECT * FROM assignment3.wine WHERE product_id=%d",
-							product_id);
-					PreparedStatement select_wine_statement = connection.prepareStatement(query_select_wine);
-					ResultSet result_select_wine = select_wine_statement.executeQuery();
+				String query_select_wine = String.format("SELECT * FROM assignment3.wine WHERE product_id=%d",
+						product_id);
+				PreparedStatement select_wine_statement = connection.prepareStatement(query_select_wine);
+				ResultSet result_select_wine = select_wine_statement.executeQuery();
 
-					if (result_select_wine.next()) {
-						String name = result_select_wine.getString("name");
-						int year = result_select_wine.getInt("year");
-						String producer = result_select_wine.getString("producer");
-						String grapeWines = result_select_wine.getString("grapeWines");
-						int quantity = result_select_wine.getInt("quantity");
-						String notes = result_select_wine.getString("notes");
-						Wine wine = new Wine(product_id, name, producer, year, notes, quantity, grapeWines);
-						notification_list.add(wine);
-					}
+				if (result_select_wine.next()) {
+					String name = result_select_wine.getString("name");
+					int year = result_select_wine.getInt("year");
+					String producer = result_select_wine.getString("producer");
+					String grapeWines = result_select_wine.getString("grapeWines");
+					int quantity = result_select_wine.getInt("quantity");
+					String notes = result_select_wine.getString("notes");
+					Wine wine = new Wine(product_id, name, producer, year, notes, quantity, grapeWines);
+					notification_list.add(wine);
 				}
 			}
 			String delete_notification_query = String
@@ -607,7 +605,7 @@ public class ServerThread extends Thread {
 
 		ArrayList<Wine> wines_order = new ArrayList<Wine>();
 		ArrayList<Integer> ids = new ArrayList<Integer>();
-		Order nullOrder = new Order(); //TODO Fix this
+		Order nullOrder = new Order(); // TODO Fix this
 		Boolean shipped = false;
 		Connection connection = getConnection();
 
