@@ -676,7 +676,7 @@ public class ServerThread extends Thread {
 			} else {
 				max_id = Collections.max(ids);
 			}
-				int order_id = max_id + 1;
+			int order_id = max_id + 1;
 			//selects all the items the user wants to buy from the cart table
 			String select_query = String.format("SELECT * FROM cart WHERE email = '%s'", email);
 
