@@ -13,6 +13,7 @@ import java.sql.SQLException;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 //TODO javadoc
@@ -369,7 +370,7 @@ public class ServerThread extends Thread {
 			if (user[1] == "1") {
 				query_id = String.format("SELECT order_id FROM assignment3.order WHERE email='%s'", user[0]);
 			} else { //permission != 1 -> the employee is calling the method, only unshipped orders can be shown
-				query_id = String.format("SELECT order_id FROM assignment3.order WHERE shipped=false", user[0]);//TODO wwhy the user[0]
+				query_id = "SELECT order_id FROM assignment3.order WHERE shipped=false";
 			}
 		}
 //TODO FINISH COMMENTS HERE
@@ -713,7 +714,7 @@ public class ServerThread extends Thread {
 						statement.executeUpdate();
 
 						//deletes from the cart table the cart of the user whose order has just been placed
-						String delete_cart_query = String.format("DELETE FROM cart WHERE email='%s'", email);
+						String delete_cart_query = String.format("DELETE FROM cart WHERE email='%s' AND product_id='%d'", email, wine_product_id);
 						PreparedStatement delete_cart_statement = connection.prepareStatement(delete_cart_query);
 						delete_cart_statement.executeUpdate(); //TODO WHY 2 DELETE FROM CART?
 					} else {
@@ -724,13 +725,15 @@ public class ServerThread extends Thread {
 			//creates the object of the new order
 			Order new_order = new Order(order_id, shipped, email, wines_order);
 
-			String delete_cart_query = String.format("DELETE FROM cart WHERE email='%s'", email);
-			PreparedStatement delete_query_statement = connection.prepareStatement(delete_cart_query);
-			delete_query_statement.executeUpdate();
+			// String delete_cart_query = String.format("DELETE FROM cart WHERE email='%s'", email);
+			// PreparedStatement delete_query_statement = connection.prepareStatement(delete_cart_query);
+			// delete_query_statement.executeUpdate();
 			//returns the object of the new order once the order is completed
 			return new_order;
 
 		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (NoSuchElementException e){
 			e.printStackTrace();
 		}
 		//returns a null_order object if the placing of the order fails
