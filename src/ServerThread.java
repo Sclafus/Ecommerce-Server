@@ -485,9 +485,11 @@ public class ServerThread extends Thread {
 				PreparedStatement statement_restock = connection.prepareStatement(query_restock);
 				statement_restock.executeUpdate();
 				// notifications
-				String notifications_query = String.format("UPDATE notification SET send=true WHERE product_id=%d", id);
-				PreparedStatement notification_statement = connection.prepareStatement(notifications_query);
-				notification_statement.executeUpdate();
+				if(new_quantity>0){
+					String notifications_query = String.format("UPDATE notification SET send=true WHERE product_id=%d", id);
+					PreparedStatement notification_statement = connection.prepareStatement(notifications_query);
+					notification_statement.executeUpdate();
+				}
 				// successful restock
 				return true;
 			}
