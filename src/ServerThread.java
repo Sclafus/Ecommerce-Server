@@ -686,8 +686,10 @@ public class ServerThread extends Thread {
 
 		ArrayList<Wine> wines_order = new ArrayList<Wine>();
 		ArrayList<Integer> ids = new ArrayList<Integer>();
+		ArrayList<Integer> id_post_order = new ArrayList<Integer>();
 		Order null_order = new Order();
 		int max_id;
+		int max_id_post;
 		Boolean shipped = false;
 		Connection connection = getConnection();
 
@@ -761,10 +763,24 @@ public class ServerThread extends Thread {
 					}
 				}
 			}
-			// creates the object of the new order
-			Order new_order = new Order(order_id, shipped, email, wines_order);
-			// returns the object of the new order once the order is completed
-			return new_order;
+
+			String post_order_query = String.format("SELECT order_id FROM assignment3.order");
+			PreparedStatement post_order_statement = connection.prepareStatement(post_order_query);
+			ResultSet post_order_result = post_order_statement.executeQuery();
+
+			while (post_order_result.next()) {
+				int order_ids = post_order_result.getInt("order_id");
+				id_post_order.add(order_ids);
+			}
+			max_id_post = Collections.max(id_post_order);
+			if(max_id_post == order_id){
+				Order new_order = new Order(order_id, shipped, email, wines_order);
+				// returns the object of the new order once the order is completed
+				return new_order;
+			} else {
+				return null_order;
+			}
+			
 
 		} catch (SQLException e) {
 			e.printStackTrace();
