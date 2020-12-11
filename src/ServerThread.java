@@ -496,7 +496,8 @@ public class ServerThread extends Thread {
 				// case 1: name not null, year null
 				query = String.format("SELECT * FROM wine WHERE name='%s'", name);
 			} else {
-				// case 2:everything is null, return, there's nothing to search //TODO Fix this
+				// case 2:everything is null, there's nothing to search, 
+				// gives all the wines
 				query = "SELECT * FROM wine";
 			}
 
@@ -720,7 +721,7 @@ public class ServerThread extends Thread {
 						//deletes from the cart table the cart of the user whose order has just been placed
 						String delete_cart_query = String.format("DELETE FROM cart WHERE email='%s' AND product_id='%d'", email, wine_product_id);
 						PreparedStatement delete_cart_statement = connection.prepareStatement(delete_cart_query);
-						delete_cart_statement.executeUpdate(); //TODO WHY 2 DELETE FROM CART?
+						delete_cart_statement.executeUpdate();
 					} else {
 						addNotification(email, wine_product_id);
 					}
