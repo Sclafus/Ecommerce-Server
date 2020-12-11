@@ -16,7 +16,11 @@ import java.util.Collections;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-//TODO javadoc
+/**
+ * This class when instantiated will make a new thread, accept the incoming
+ * message from the socket, route it with the different options and responds
+ * with appropriate output for the different methods.
+ */
 public class ServerThread extends Thread {
 	private Socket socket;
 
