@@ -342,7 +342,6 @@ public class ServerThread extends Thread {
 
 	}
 
-	// TODO fix javadoc & add comments
 	/**
 	 * Returns the list of the orders that have been placed if no 
 	 * parameters are given. If a parameter is passed it can return 
@@ -566,10 +565,20 @@ public class ServerThread extends Thread {
 		return false;
 	}
 
-	// TODO javadoc and comments
+	/**
+	 * Gets all the notifications from the notifications' table where the email's field
+	 * in the table corrisponds with the given {@code User}'s email. It returns 
+	 * a ArrayList<Wine> containing all the wines the {@code User} need to be notificated for.
+	 * 
+	 * @param email    of the {@code User}. [String]
+	 * @return the ArrayList with the {@code Wine} the {@code User} needs to be notificated for. [ArrayList<Wine>]
+	 * @see User
+	 * @see Wine
+	 */
 	public static ArrayList<Wine> getNotifications(String email) {
 		Connection connection = getConnection();
 		ArrayList<Wine> notification_list = new ArrayList<Wine>();
+		//select all the notifications to send 
 		String query_select_notification = String
 				.format("SELECT product_id, send FROM assignment3.notification WHERE email='%s'", email);
 
@@ -607,7 +616,16 @@ public class ServerThread extends Thread {
 		return notification_list;
 	}
 
-	// TODO javadoc and comments
+	/**
+	 * Adds a new notification to the notifications' table.
+	 * 
+	 * @param email       of the {@code User} who will receive the notification. [String]
+	 * @param product_id  of the {@code wine} that the {@code User} will be notificated about. [int]
+	 * @return {@code true} if the operation is successful, otherwise the {@code false}.
+	 *         [Boolean]
+	 * @see User
+	 * @see Wine
+	 */
 	public static Boolean addNotification(String email, int product_id) {
 		Connection connection = getConnection();
 		String insert_notification_query = String
