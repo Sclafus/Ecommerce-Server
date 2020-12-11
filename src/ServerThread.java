@@ -741,14 +741,16 @@ public class ServerThread extends Thread {
 			ResultSet cart_query_result = cart_statement.executeQuery();
 
 			while (cart_query_result.next()) {
+				//the cart was found
 				int product_id = cart_query_result.getInt("product_id");
 				int quantity = cart_query_result.getInt("quantity");
+				//selecting each item of the cart from the wine table
 				String get_wine_query = String.format("SELECT * FROM wine WHERE product_id = %d", product_id);
 
 				PreparedStatement wine_statement = connection.prepareStatement(get_wine_query);
 				ResultSet wine_query_result = wine_statement.executeQuery();
 				if (wine_query_result.next()) {
-
+					//creating the object Wine
 					String wine_name = wine_query_result.getString("name");
 					String wine_producer = wine_query_result.getString("producer");
 					String wine_grapeWines = wine_query_result.getString("grapeWines");
@@ -757,6 +759,7 @@ public class ServerThread extends Thread {
 
 					Wine new_wine = new Wine(product_id, wine_name, wine_producer, wine_year, wine_notes, quantity,
 							wine_grapeWines);
+					//object wine is added to the list of wines to display
 					display_cart_list.add(new_wine);
 				}
 			}
@@ -770,7 +773,7 @@ public class ServerThread extends Thread {
 	 * Allows the {@code User} to remove from the cart any of the wine added to it.
 	 * 
 	 * @param email    of the {@code User}. [String]
-	 * @param id       of te {@code wine} that the {@code User} wants to remove from the cart. [int]
+	 * @param id       of te {@code Wine} that the {@code User} wants to remove from the cart. [int]
 	 * @return {@code true} if the operation is successful, otherwise the {@code false}.
 	 *         [Boolean]
 	 * @see User
@@ -790,7 +793,14 @@ public class ServerThread extends Thread {
 		return false;
 	}
 
-	// TODO javadoc
+	/**
+	 * Allows the {@code User} with permission = 2 (the employee) to ship a selected {@code Order}.
+	 * 
+	 * @param order_id   of the {@code Order} to ship. [int]
+	 * @return {@code true} if the operation is successful, otherwise the {@code false}.
+	 *         [Boolean]
+	 * @see Order
+	 */
 	public static Boolean shipOrder(int order_id) {
 		Connection connection = getConnection();
 		String query_select_order = String.format("UPDATE assignment3.order SET shipped=true WHERE order_id=%d",
