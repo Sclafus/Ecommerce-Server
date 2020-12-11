@@ -538,9 +538,9 @@ public class ServerThread extends Thread {
 	}
 
 	/**
-	 * Allows to restock a wine by adding to the existing quantity a new quantity
-	 * specified by the employee. It returns the {@code true} if the operation is
-	 * successful, otherwise it returns the {@code false}.
+	 * Allows the {@code User} to add a quantity of a {@code Wine} to the cart.
+	 * It returns the {@code true} if the operation is successful,
+	 * else the {@code false}. 
 	 * 
 	 * @param email    of the {@code User} adding to the cart. [String]
 	 * @param id       of the {@code Wine}. [int]
@@ -566,7 +566,7 @@ public class ServerThread extends Thread {
 		return false;
 	}
 
-	// TODO javadoc
+	// TODO javadoc and comments
 	public static ArrayList<Wine> getNotifications(String email) {
 		Connection connection = getConnection();
 		ArrayList<Wine> notification_list = new ArrayList<Wine>();
@@ -607,7 +607,7 @@ public class ServerThread extends Thread {
 		return notification_list;
 	}
 
-	// TODO javadoc
+	// TODO javadoc and comments
 	public static Boolean addNotification(String email, int product_id) {
 		Connection connection = getConnection();
 		String insert_notification_query = String
