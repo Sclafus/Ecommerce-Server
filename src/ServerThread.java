@@ -656,6 +656,7 @@ public class ServerThread extends Thread {
 		ArrayList<Wine> wines_order = new ArrayList<Wine>();
 		ArrayList<Integer> ids = new ArrayList<Integer>();
 		Order null_order = new Order(); 
+		int max_id;
 		Boolean shipped = false;
 		Connection connection = getConnection();
 
@@ -670,9 +671,12 @@ public class ServerThread extends Thread {
 				ids.add(order_id);
 			}
 			//gets the max id from the list, it refers to the last order placed
-			int max_id = Collections.max(ids);
-			System.out.println(max_id);
-			int order_id = max_id + 1;
+			if(ids.size()==0){
+				max_id = 0;
+			} else {
+				max_id = Collections.max(ids);
+			}
+				int order_id = max_id + 1;
 			//selects all the items the user wants to buy from the cart table
 			String select_query = String.format("SELECT * FROM cart WHERE email = '%s'", email);
 
