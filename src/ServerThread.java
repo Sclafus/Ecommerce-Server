@@ -30,24 +30,14 @@ public class ServerThread extends Thread {
 	public void run() {
 
 		try {
-<<<<<<< HEAD
-			InputStream inputStream = this.socket.getInputStream(); // TODO fix this
-			ObjectInputStream in = new ObjectInputStream(inputStream);
-=======
 			InputStream input_stream = this.socket.getInputStream(); 
 			ObjectInputStream in = new ObjectInputStream(input_stream);
->>>>>>> 9b0dc8ff9a2b5ad0b6219862bbb8b204668f3bc7
 
 			try {
 				// input from the client
 				String[] msg = (String[]) in.readObject();
-<<<<<<< HEAD
-				OutputStream outputStream = this.socket.getOutputStream(); // TODO fix this
-				ObjectOutputStream out = new ObjectOutputStream(outputStream);
-=======
 				OutputStream output_stream = this.socket.getOutputStream(); 
 				ObjectOutputStream out = new ObjectOutputStream(output_stream);
->>>>>>> 9b0dc8ff9a2b5ad0b6219862bbb8b204668f3bc7
 
 				// stuff happens here!
 				switch (msg[0]) {
@@ -192,11 +182,7 @@ public class ServerThread extends Thread {
 
 		Connection connection = getConnection();
 		String query = String.format("SELECT * FROM user WHERE email='%s'", email);
-<<<<<<< HEAD
-		User nullUser = new User(); // TODO fix this
-=======
 		User null_user = new User(); 
->>>>>>> 9b0dc8ff9a2b5ad0b6219862bbb8b204668f3bc7
 
 		try {
 			PreparedStatement statement = connection.prepareStatement(query);
@@ -216,13 +202,8 @@ public class ServerThread extends Thread {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-<<<<<<< HEAD
-		// returns nullUser if the password is wrong or account doesn't exists.
-		return nullUser; // TODO fix this
-=======
 		// returns null_user if the password is wrong or account doesn't exists.
 		return null_user; 
->>>>>>> 9b0dc8ff9a2b5ad0b6219862bbb8b204668f3bc7
 	}
 
 	/**
@@ -242,11 +223,7 @@ public class ServerThread extends Thread {
 	 * @see Wine
 	 */
 	public static Wine addWine(String name, int year, String producer, String grapes, String notes) {
-<<<<<<< HEAD
-		Wine nullWine = new Wine(); // TODO fix this
-=======
 		Wine null_wine = new Wine(); 
->>>>>>> 9b0dc8ff9a2b5ad0b6219862bbb8b204668f3bc7
 
 		Connection connection = getConnection();
 		String select_query = String.format(
@@ -283,12 +260,8 @@ public class ServerThread extends Thread {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-<<<<<<< HEAD
-		return nullWine; // TODO Fix this
-=======
 		//operation failed and null_wine is returned
 		return null_wine; 
->>>>>>> 9b0dc8ff9a2b5ad0b6219862bbb8b204668f3bc7
 	}
 
 	/**
@@ -308,11 +281,7 @@ public class ServerThread extends Thread {
 
 		Connection connection = getConnection();
 		String query = String.format("SELECT email FROM user WHERE email='%s'", mail);
-<<<<<<< HEAD
-		User nullUser = new User(); // TODO Fix this
-=======
 		User null_user = new User(); 
->>>>>>> 9b0dc8ff9a2b5ad0b6219862bbb8b204668f3bc7
 
 		try {
 			PreparedStatement statement = connection.prepareStatement(query);
@@ -325,15 +294,6 @@ public class ServerThread extends Thread {
 				//user never registered
 				String insert_query = String.format(
 						"INSERT INTO user(name, surname, email, password, permission) VALUES ('%s', '%s', '%s', '%s', %d)",
-<<<<<<< HEAD
-						name, surname, mail, password, permission); // TODO Fix this
-
-				PreparedStatement statement1 = connection.prepareStatement(query1); // TODO Fix this
-				statement1.executeUpdate(); // TODO Fix this
-				User newUser = new User(name, surname, mail, password, permission); // TODO Fix this
-				System.out.format("User %s has been added\n", mail);
-				return newUser; // TODO Fix this
-=======
 						name, surname, mail, password, permission); 
 
 				PreparedStatement insert_statement = connection.prepareStatement(insert_query); 
@@ -342,17 +302,12 @@ public class ServerThread extends Thread {
 				System.out.format("User %s has been added\n", mail);
 				//registration successful, the User object is returned
 				return new_user; 
->>>>>>> 9b0dc8ff9a2b5ad0b6219862bbb8b204668f3bc7
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-<<<<<<< HEAD
-		return nullUser; // TODO Fix this
-=======
 		//registration not successful, the null_user object is returned
 		return null_user; 
->>>>>>> 9b0dc8ff9a2b5ad0b6219862bbb8b204668f3bc7
 	}
 
 	/**
@@ -699,11 +654,7 @@ public class ServerThread extends Thread {
 
 		ArrayList<Wine> wines_order = new ArrayList<Wine>();
 		ArrayList<Integer> ids = new ArrayList<Integer>();
-<<<<<<< HEAD
-		Order nullOrder = new Order(); // TODO Fix this
-=======
 		Order null_order = new Order(); 
->>>>>>> 9b0dc8ff9a2b5ad0b6219862bbb8b204668f3bc7
 		Boolean shipped = false;
 		Connection connection = getConnection();
 
