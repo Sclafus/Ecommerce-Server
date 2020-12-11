@@ -515,6 +515,7 @@ public class ServerThread extends Thread {
 			ResultSet results = statement.executeQuery();
 
 			while (results.next()) {
+				//Wines withe the given costraints are found
 				int wine_product_id = results.getInt("product_id");
 				String wine_name = results.getString("name");
 				int wine_year = results.getInt("year");
@@ -522,14 +523,17 @@ public class ServerThread extends Thread {
 				String wine_grapes = results.getString("grapeWines");
 				int wine_quantity = results.getInt("quantity");
 				String wine_notes = results.getString("notes");
+				//Wine object is created
 				Wine wine = new Wine(wine_product_id, wine_name, wine_producer, wine_year, wine_notes, wine_quantity,
 						wine_grapes);
+				//Wine object is added to the list of the search results
 				search_result_list.add(wine);
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		//list of search results is returned
 		return search_result_list;
 	}
 
