@@ -51,10 +51,12 @@ public class ServerThread extends Thread {
 						User login_result = login(msg[1], msg[2]);
 						out.writeObject(login_result);
 						break;
+						
 					case "guest":
 						User guest_result = guest();
 						out.writeObject(guest_result);
 						break;
+
 					case "register_user":
 						User register_user_result = register(msg[1], msg[2], msg[3], msg[4], 1);
 						out.writeObject(register_user_result);
