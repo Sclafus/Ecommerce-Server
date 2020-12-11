@@ -447,9 +447,10 @@ public class ServerThread extends Thread {
 			PreparedStatement statement = connection.prepareStatement(query);
 			ResultSet query_result = statement.executeQuery();
 
-			while (query_result.next()) {
+			if (query_result.next()) {
+				//the Wine to restock is found
 				int old_quantity = query_result.getInt("quantity");
-
+				//the quantity is updated
 				String query_restock = String.format("UPDATE wine SET quantity = %d WHERE product_id = %d",
 						new_quantity + old_quantity, id);
 
@@ -459,11 +460,13 @@ public class ServerThread extends Thread {
 				String notifications_query = String.format("UPDATE notification SET send=true WHERE product_id=%d", id);
 				PreparedStatement notification_statement = connection.prepareStatement(notifications_query);
 				notification_statement.executeUpdate();
+				//successful restock
 				return true;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		//unsuccessful restock
 		return false;
 	}
 
