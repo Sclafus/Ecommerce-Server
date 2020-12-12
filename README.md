@@ -1,6 +1,10 @@
-## Third assignment for my "Software Engineering" course. Developed by me and a colleague.
+## Third assignment for my Software Engineering course. Developed by me and a [colleague](https://github.com/marticaffa).
 
-This is a Server app made for [Wine Ecommerce](https://github.com/Sclafus/Wine-Ecommerce).
+
+[![CodeFactor](https://www.codefactor.io/repository/github/sclafus/ecommerce-server/badge)](https://www.codefactor.io/repository/github/sclafus/ecommerce-server)
+
+
+This is a Server app based on [Wine Ecommerce](https://github.com/Sclafus/Wine-Ecommerce).
 
 It's using:
 * Client-Server architecture (with JDBC)
