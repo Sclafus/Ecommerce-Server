@@ -653,7 +653,7 @@ public class ServerThread extends Thread {
 	 * 
 	 * @param email      of the {@code User} who will receive the notification.
 	 *                   [String]
-	 * @param productId of the {@code wine} that the {@code User} will be
+	 * @param productId  of the {@code wine} that the {@code User} will be
 	 *                   notificated about. [int]
 	 * @return {@code true} if the operation is successful, otherwise the
 	 *         {@code false}. [Boolean]
