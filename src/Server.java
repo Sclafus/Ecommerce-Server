@@ -11,7 +11,6 @@ public class Server {
 
 	@SuppressWarnings({ "resource" })
 	public void run() throws IOException {
-
 		ServerSocket serverSocket = new ServerSocket(PORT);
 		System.out.println("Server ready for connections!");
 		int i = 0;
@@ -21,6 +20,5 @@ public class Server {
 			System.out.format("Connection %d\n", ++i);
 			new ServerThread(socket).start();
 		}
-
 	}
 }

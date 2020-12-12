@@ -10,7 +10,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.NoSuchElementException;
@@ -24,6 +23,13 @@ import java.util.stream.Collectors;
 public class ServerThread extends Thread {
 	private Socket socket;
 
+	/**
+	 * ServerThread class constructor. This constructor is called automatically by
+	 * {@code Server} to invoke a new thread.
+	 * 
+	 * @param socket the socket passed by the {@code Server}
+	 * @see Server
+	 */
 	ServerThread(Socket socket) {
 		this.socket = socket;
 	}
@@ -51,10 +57,10 @@ public class ServerThread extends Thread {
 						User loginResult = login(msg[1], msg[2]);
 						out.writeObject(loginResult);
 						break;
-						
+
 					case "guest":
-						User guestResult = guest();
-						out.writeObject(guestResult);
+						// returns a null user, it's used to login as a guest
+						out.writeObject(new User());
 						break;
 
 					case "register_user":
@@ -113,8 +119,7 @@ public class ServerThread extends Thread {
 						break;
 
 					case "add_to_cart":
-						Boolean addToCartResult = addToCart(msg[1], Integer.parseInt(msg[2]),
-								Integer.parseInt(msg[3]));
+						Boolean addToCartResult = addToCart(msg[1], Integer.parseInt(msg[2]), Integer.parseInt(msg[3]));
 						out.writeObject(addToCartResult);
 						break;
 
@@ -178,11 +183,6 @@ public class ServerThread extends Thread {
 		return null;
 	}
 
-	public static User guest(){
-
-		User nullUser = new User();
-		return nullUser;
-	}
 	/**
 	 * Checks if the user with the selected email and password is present in the
 	 * database.
@@ -239,11 +239,11 @@ public class ServerThread extends Thread {
 	 */
 	public static Wine addWine(String name, int year, String producer, String grapes, String notes) {
 		Wine nullWine = new Wine();
-
 		Connection connection = getConnection();
 		String selectQuery = String.format(
 				"SELECT name, year, producer FROM wine WHERE name='%s' AND year=%d AND producer='%s'", name, year,
 				producer);
+
 		try {
 			PreparedStatement statement = connection.prepareStatement(selectQuery);
 			ResultSet queryResult = statement.executeQuery();
@@ -253,17 +253,15 @@ public class ServerThread extends Thread {
 				String insertQuery = String.format(
 						"INSERT INTO wine(name, year, producer, grapeWines, notes, quantity) VALUES ('%s', %d, '%s', '%s', '%s', 0)",
 						name, year, producer, grapes, notes);
-
 				PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
 				insertStatement.executeUpdate();
-
 				// building Wine object
 				String queryId = String.format(
 						"SELECT product_id FROM wine WHERE name='%s' AND year=%d AND producer='%s' AND grapeWines='%s' AND notes='%s'",
 						name, year, producer, grapes, notes);
-
 				PreparedStatement statementId = connection.prepareStatement(queryId);
 				ResultSet queryIdResult = statementId.executeQuery();
+
 				if (queryIdResult.next()) {
 					// Wine object is created and returned
 					int id = queryIdResult.getInt("product_id");
@@ -293,7 +291,6 @@ public class ServerThread extends Thread {
 	 * @see User
 	 */
 	public static User register(String name, String surname, String mail, String password, int permission) {
-
 		Connection connection = getConnection();
 		String query = String.format("SELECT email FROM user WHERE email='%s'", mail);
 		User nullUser = new User();
@@ -310,11 +307,9 @@ public class ServerThread extends Thread {
 				String insertQuery = String.format(
 						"INSERT INTO user(name, surname, email, password, permission) VALUES ('%s', '%s', '%s', '%s', %d)",
 						name, surname, mail, password, permission);
-
 				PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
 				insertStatement.executeUpdate();
 				User newUser = new User(name, surname, mail, password, permission);
-				System.out.format("User %s has been added\n", mail);
 				// registration successful, the User object is returned
 				return newUser;
 			}
@@ -349,12 +344,10 @@ public class ServerThread extends Thread {
 				User user = new User(name, surname, email, "", permission);
 				userList.add(user);
 			}
-
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return userList;
-
 	}
 
 	/**
@@ -378,22 +371,21 @@ public class ServerThread extends Thread {
 		// no optional parameter passed
 		// it returns the list of all the orders -> only the admins can access
 		String queryId = "";
-		if (user.length == 0) {
+		if (user.length == 0)
 			queryId = "SELECT order_id FROM assignment3.order";
-		}
+
 		// optional parameters are passed
 		if (user.length == 2) {
 			// checks the parameter user[1]
 			// it represents the permission of the User calling the method
-			if (user[1] == "1") {
+			if (user[1] == "1")
 				// permission = 1 -> the basic User is calling the method, we select all of his
 				// orders.
 				queryId = String.format("SELECT order_id FROM assignment3.order WHERE email='%s'", user[0]);
-			} else {
+			else
 				// permission != 1 -> the employee is calling the method, only unshipped orders
 				// can be shown
 				queryId = "SELECT order_id FROM assignment3.order WHERE shipped=false";
-			}
 		}
 
 		try {
@@ -401,15 +393,13 @@ public class ServerThread extends Thread {
 			ResultSet queryResultId = statementId.executeQuery();
 			ArrayList<Integer> orderIdDuplicates = new ArrayList<Integer>();
 			// gets all the orders from the order table.
-			while (queryResultId.next()) {
+			while (queryResultId.next())
 				orderIdDuplicates.add(queryResultId.getInt("order_id"));
-			}
 
-			// we have multiple entries for a determined orderId, we have to eliminate the
-			// duplicates
+			// we have multiple entries for a determined orderId,
+			// we have to delete the duplicates
 			ArrayList<Integer> orderIds = (ArrayList<Integer>) orderIdDuplicates.stream().distinct()
 					.collect(Collectors.toList());
-
 			Collections.sort(orderIds);
 
 			for (int orderId : orderIds) {
@@ -418,9 +408,9 @@ public class ServerThread extends Thread {
 				PreparedStatement statement = connection.prepareStatement(query);
 				ResultSet queryResult = statement.executeQuery();
 				ArrayList<Wine> products = new ArrayList<Wine>();
-
 				String email = "";
 				Boolean shipped = false;
+
 				while (queryResult.next()) {
 					// gets the wine of the selected entry
 					email = queryResult.getString("email");
@@ -447,9 +437,7 @@ public class ServerThread extends Thread {
 				// instantiate the order object
 				Order newOrder = new Order(orderId, shipped, email, products);
 				ordersList.add(newOrder);
-
 			}
-
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -461,7 +449,7 @@ public class ServerThread extends Thread {
 	 * specified by the employee. It returns the {@code true} if the operation is
 	 * successful, otherwise it returns the {@code false}.
 	 * 
-	 * @param id           of the {@code Wine}. [int]
+	 * @param id          of the {@code Wine}. [int]
 	 * @param newQuantity the quantity that we want to restock. [int]
 	 * @return {@code true} if the wine has been restocked, {@code false} if the
 	 *         wine has not been restocked for whatever reason. [Boolean]
@@ -481,12 +469,12 @@ public class ServerThread extends Thread {
 				// the quantity is updated
 				String queryRestock = String.format("UPDATE wine SET quantity = %d WHERE product_id = %d",
 						newQuantity + oldQuantity, id);
-
 				PreparedStatement statementRestock = connection.prepareStatement(queryRestock);
 				statementRestock.executeUpdate();
 				// notifications
-				if(newQuantity>0){
-					String notificationsQuery = String.format("UPDATE notification SET send=true WHERE product_id=%d", id);
+				if (newQuantity > 0) {
+					String notificationsQuery = String.format("UPDATE notification SET send=true WHERE product_id=%d",
+							id);
 					PreparedStatement notificationStatement = connection.prepareStatement(notificationsQuery);
 					notificationStatement.executeUpdate();
 				}
@@ -506,7 +494,7 @@ public class ServerThread extends Thread {
 	 * {@code Wine}. Once the wines are found, their corrisponding objects are added
 	 * to a list which is then returned.
 	 * 
-	 * @param name        of the wine to search. [String]
+	 * @param name       of the wine to search. [String]
 	 * @param yearString of the wine to search. [String]
 	 * @return ArrayList with all the Wines found. [ArrayList of Wine]
 	 * @see Wine
@@ -519,7 +507,6 @@ public class ServerThread extends Thread {
 
 		try {
 			year = Integer.parseInt(yearString);
-
 		} catch (NumberFormatException e) {
 			// year is null
 			if (!name.equals("")) {
@@ -530,15 +517,13 @@ public class ServerThread extends Thread {
 				// gives all the wines
 				query = "SELECT * FROM wine";
 			}
-
 		} finally {
-			if (name.equals("") && year != 0) {
+			if (name.equals("") && year != 0)
 				// case 3: name null, year not null
 				query = String.format("SELECT * FROM wine WHERE year=%d", year);
-			} else if (year != 0) {
+			else if (year != 0)
 				// case 4: nothing is null
 				query = String.format("SELECT * FROM wine WHERE year=%d AND name='%s'", year, name);
-			}
 		}
 
 		try {
@@ -560,7 +545,6 @@ public class ServerThread extends Thread {
 				// Wine object is added to the list of the search results
 				searchResultList.add(wine);
 			}
-
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -586,15 +570,14 @@ public class ServerThread extends Thread {
 		Connection connection = getConnection();
 		String query = String.format("INSERT INTO cart(email, product_id, quantity) VALUES ('%s', %d, %d)", email, id,
 				quantity);
+
 		try {
 			PreparedStatement statement = connection.prepareStatement(query);
 			statement.executeUpdate();
 			return true;
-
 		} catch (SQLException e) {
-			e.printStackTrace();
+			return false;
 		}
-		return false;
 	}
 
 	/**
@@ -622,8 +605,7 @@ public class ServerThread extends Thread {
 
 			while (resultSelectNotification.next()) {
 				int productId = resultSelectNotification.getInt("product_id");
-				String querySelectWine = String.format("SELECT * FROM assignment3.wine WHERE product_id=%d",
-						productId);
+				String querySelectWine = String.format("SELECT * FROM assignment3.wine WHERE product_id=%d", productId);
 				PreparedStatement selectWineStatement = connection.prepareStatement(querySelectWine);
 				ResultSet resultSelectWine = selectWineStatement.executeQuery();
 
@@ -651,10 +633,10 @@ public class ServerThread extends Thread {
 	/**
 	 * Adds a new notification to the notifications' table.
 	 * 
-	 * @param email      of the {@code User} who will receive the notification.
-	 *                   [String]
-	 * @param productId  of the {@code wine} that the {@code User} will be
-	 *                   notificated about. [int]
+	 * @param email     of the {@code User} who will receive the notification.
+	 *                  [String]
+	 * @param productId of the {@code wine} that the {@code User} will be
+	 *                  notificated about. [int]
 	 * @return {@code true} if the operation is successful, otherwise the
 	 *         {@code false}. [Boolean]
 	 * @see User
@@ -662,18 +644,16 @@ public class ServerThread extends Thread {
 	 */
 	public static Boolean addNotification(String email, int productId) {
 		Connection connection = getConnection();
-		String insertNotificationQuery = String
-				.format("INSERT INTO notification(email, product_id) VALUES ('%s', %d)", email, productId);
+		String insertNotificationQuery = String.format("INSERT INTO notification(email, product_id) VALUES ('%s', %d)",
+				email, productId);
 
 		try {
 			PreparedStatement insertNotificationStatement = connection.prepareStatement(insertNotificationQuery);
 			insertNotificationStatement.executeUpdate();
 			return true;
 		} catch (SQLException e) {
-			e.printStackTrace();
+			return false;
 		}
-
-		return false;
 	}
 
 	/**
@@ -687,18 +667,18 @@ public class ServerThread extends Thread {
 	 * @see Wine
 	 */
 	public static Order addOrder(String email) {
-
 		ArrayList<Wine> winesOrder = new ArrayList<Wine>();
 		ArrayList<Integer> ids = new ArrayList<Integer>();
 		ArrayList<Integer> idPostOrder = new ArrayList<Integer>();
 		Order nullOrder = new Order();
-		int maxId;
+		int maxId = 0;
 		int maxIdPost;
 		Boolean shipped = false;
 		Connection connection = getConnection();
 
 		// selects all the order ids from the order table and adds them to a list
 		String getIdQuery = String.format("SELECT order_id FROM assignment3.order");
+
 		try {
 			PreparedStatement getIdStatement = connection.prepareStatement(getIdQuery);
 			ResultSet getIdResult = getIdStatement.executeQuery();
@@ -708,11 +688,9 @@ public class ServerThread extends Thread {
 				ids.add(orderId);
 			}
 			// gets the max id from the list, it refers to the last order placed
-			if (ids.size() == 0) {
-				maxId = 0;
-			} else {
+			if (!(ids.size() == 0))
 				maxId = Collections.max(ids);
-			}
+
 			int orderId = maxId + 1;
 			// selects all the items the user wants to buy from the cart table
 			String selectQuery = String.format("SELECT * FROM cart WHERE email = '%s'", email);
@@ -725,7 +703,6 @@ public class ServerThread extends Thread {
 				int wineQuantity = selectQueryResult.getInt("quantity");
 				// selects the wines the user wants to buy from the wine table
 				String queryWine = String.format("SELECT * FROM wine WHERE product_id = %d", wineProductId);
-
 				PreparedStatement wineStatement = connection.prepareStatement(queryWine);
 				ResultSet wineQueryResult = wineStatement.executeQuery();
 
@@ -752,22 +729,20 @@ public class ServerThread extends Thread {
 						String query = String.format(
 								"INSERT INTO assignment3.order(order_id, product_id, quantity, email, shipped) VALUES (%d, %d, %d, '%s', %b)",
 								orderId, wineProductId, wineQuantity, email, false);
-
 						PreparedStatement statement = connection.prepareStatement(query);
 						statement.executeUpdate();
 
 						// deletes from the cart table the cart of the user whose order has just been
 						// placed
-						String deleteCartQuery = String.format(
-								"DELETE FROM cart WHERE email='%s' AND product_id='%d'", email, wineProductId);
+						String deleteCartQuery = String.format("DELETE FROM cart WHERE email='%s' AND product_id='%d'",
+								email, wineProductId);
 						PreparedStatement deleteCartStatement = connection.prepareStatement(deleteCartQuery);
 						deleteCartStatement.executeUpdate();
-					} else {
+					} else
 						addNotification(email, wineProductId);
-					}
 				}
 			}
-			//checks if the order was placed or not
+			// checks if the order was placed or not
 			String postOrderQuery = String.format("SELECT order_id FROM assignment3.order");
 			PreparedStatement postOrderStatement = connection.prepareStatement(postOrderQuery);
 			ResultSet postOrderResult = postOrderStatement.executeQuery();
@@ -777,17 +752,12 @@ public class ServerThread extends Thread {
 				idPostOrder.add(orderIds);
 			}
 			maxIdPost = Collections.max(idPostOrder);
-			//the order was added to the order table
-			if(maxIdPost == orderId){
+			// the order was added to the order table
+			if (maxIdPost == orderId) {
 				Order newOrder = new Order(orderId, shipped, email, winesOrder);
 				// returns the object of the new order once the order is completed
 				return newOrder;
-			} else {
-				//returns nullOrder if the wine is not in stock or there's not enough wine
-				return nullOrder;
 			}
-			
-
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (NoSuchElementException e) {
@@ -808,7 +778,6 @@ public class ServerThread extends Thread {
 	 */
 	public static ArrayList<Wine> displayCart(String email) {
 		ArrayList<Wine> displayCartList = new ArrayList<Wine>();
-
 		Connection connection = getConnection();
 		String getCartQuery = String.format("SELECT * FROM cart WHERE email = '%s'", email);
 
@@ -822,9 +791,9 @@ public class ServerThread extends Thread {
 				int quantity = cartQueryResult.getInt("quantity");
 				// selecting each item of the cart from the wine table
 				String getWineQuery = String.format("SELECT * FROM wine WHERE product_id = %d", productId);
-
 				PreparedStatement wineStatement = connection.prepareStatement(getWineQuery);
 				ResultSet wineQueryResult = wineStatement.executeQuery();
+
 				if (wineQueryResult.next()) {
 					// creating the object Wine
 					String wineName = wineQueryResult.getString("name");
@@ -832,7 +801,6 @@ public class ServerThread extends Thread {
 					String wineGrapeWines = wineQueryResult.getString("grapeWines");
 					String wineNotes = wineQueryResult.getString("notes");
 					int wineYear = wineQueryResult.getInt("year");
-
 					Wine newWine = new Wine(productId, wineName, wineProducer, wineYear, wineNotes, quantity,
 							wineGrapeWines);
 					// object wine is added to the list of wines to display
@@ -859,11 +827,11 @@ public class ServerThread extends Thread {
 	public static Boolean removeFromCart(String email, int id) {
 		Connection connection = getConnection();
 		String query = String.format("DELETE FROM cart WHERE email='%s' AND product_id=%d", email, id);
+
 		try {
 			PreparedStatement statement = connection.prepareStatement(query);
 			statement.executeUpdate();
 			return true;
-
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -881,8 +849,7 @@ public class ServerThread extends Thread {
 	 */
 	public static Boolean shipOrder(int orderId) {
 		Connection connection = getConnection();
-		String querySelectOrder = String.format("UPDATE assignment3.order SET shipped=true WHERE order_id=%d",
-				orderId);
+		String querySelectOrder = String.format("UPDATE assignment3.order SET shipped=true WHERE order_id=%d", orderId);
 
 		try {
 			PreparedStatement statementSelectOrder = connection.prepareStatement(querySelectOrder);
@@ -892,6 +859,5 @@ public class ServerThread extends Thread {
 			e.printStackTrace();
 		}
 		return false;
-
 	}
 }
