@@ -371,21 +371,22 @@ public class ServerThread extends Thread {
 		// no optional parameter passed
 		// it returns the list of all the orders -> only the admins can access
 		String queryId = "";
-		if (user.length == 0)
+		if (user.length == 0) {
 			queryId = "SELECT order_id FROM assignment3.order";
-
+		}
 		// optional parameters are passed
 		if (user.length == 2) {
 			// checks the parameter user[1]
 			// it represents the permission of the User calling the method
-			if (user[1] == "1")
+			if (user[1] == "1") {
 				// permission = 1 -> the basic User is calling the method, we select all of his
 				// orders.
 				queryId = String.format("SELECT order_id FROM assignment3.order WHERE email='%s'", user[0]);
-			else
+			} else {
 				// permission != 1 -> the employee is calling the method, only unshipped orders
 				// can be shown
 				queryId = "SELECT order_id FROM assignment3.order WHERE shipped=false";
+			}
 		}
 
 		try {
@@ -518,12 +519,13 @@ public class ServerThread extends Thread {
 				query = "SELECT * FROM wine";
 			}
 		} finally {
-			if (name.equals("") && year != 0)
+			if (name.equals("") && year != 0) {
 				// case 3: name null, year not null
 				query = String.format("SELECT * FROM wine WHERE year=%d", year);
-			else if (year != 0)
+			} else if (year != 0) {
 				// case 4: nothing is null
 				query = String.format("SELECT * FROM wine WHERE year=%d AND name='%s'", year, name);
+			}
 		}
 
 		try {
@@ -688,9 +690,9 @@ public class ServerThread extends Thread {
 				ids.add(orderId);
 			}
 			// gets the max id from the list, it refers to the last order placed
-			if (!(ids.size() == 0))
+			if (!(ids.size() == 0)){
 				maxId = Collections.max(ids);
-
+			}
 			int orderId = maxId + 1;
 			// selects all the items the user wants to buy from the cart table
 			String selectQuery = String.format("SELECT * FROM cart WHERE email = '%s'", email);
@@ -738,8 +740,9 @@ public class ServerThread extends Thread {
 								email, wineProductId);
 						PreparedStatement deleteCartStatement = connection.prepareStatement(deleteCartQuery);
 						deleteCartStatement.executeUpdate();
-					} else
+					} else {
 						addNotification(email, wineProductId);
+					}
 				}
 			}
 			// checks if the order was placed or not
