@@ -18,12 +18,17 @@ The Client application is available [here](https://github.com/Sclafus/Ecommerce-
 The DB structure is pretty simple. It has some flaws, but this is not meant to be used in production, so... 🤷‍♂️
 
 ### Database Structure
+
 ![Database Structure](db_structure.png)
 
 ### UML Class Diagram
+
 ![UML Class Diagram](UML/ClassDiagram.svg)
 
 ### UML Usecase Diagram
+
 ![UML Usecase Diagram](UML/UsecaseDiagram.svg)
+
 ### UML Deployment Diagram
+
 ![UML Deployment Diagram](UML/DeploymentDiagram.svg)
